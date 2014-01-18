@@ -31,6 +31,8 @@
 #include <QObject>
 #include <QGuiApplication>
 #include <QQmlEngine>
+#include <QQuickView>
+#include <QQmlContext>
 #include <QScopedPointer>
 #ifdef QT_QML_DEBUG
 #include <QtQuick>
