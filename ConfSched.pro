@@ -9,8 +9,10 @@
 TARGET = ConfSched
 
 CONFIG += sailfishapp
+CONFIG += c++11
 
-SOURCES += src/ConfSched.cpp
+SOURCES += src/ConfSched.cpp \
+    src/conf_scheduler.cpp
 
 OTHER_FILES += qml/ConfSched.qml \
     qml/cover/CoverPage.qml \
@@ -19,4 +21,7 @@ OTHER_FILES += qml/ConfSched.qml \
     rpm/ConfSched.spec \
     rpm/ConfSched.yaml \
     ConfSched.desktop
+
+HEADERS += \
+    src/conf_scheduler.h
 
