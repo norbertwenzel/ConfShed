@@ -3,6 +3,9 @@
 
 #include <QObject>
 
+namespace cfs
+{
+
 class conf_scheduler : public QObject
 {
     Q_OBJECT
@@ -14,5 +17,7 @@ signals:
 public slots:
 
 };
+
+} //namespace cfs
 
 #endif // CONF_SCHEDULER_H
