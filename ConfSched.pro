@@ -17,7 +17,6 @@ SOURCES += src/ConfSched.cpp \
 OTHER_FILES += qml/ConfSched.qml \
     qml/cover/CoverPage.qml \
     qml/pages/FirstPage.qml \
-    qml/pages/SecondPage.qml \
     rpm/ConfSched.spec \
     rpm/ConfSched.yaml \
     ConfSched.desktop
