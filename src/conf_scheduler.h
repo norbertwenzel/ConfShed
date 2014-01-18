@@ -18,6 +18,7 @@ public:
 
 signals:
     void conferenceAdded(const QUrl &conf_data_url) const;
+    void error(const QString &message) const;
 
 public slots:
     void addConference(const QUrl &conf_data_url);

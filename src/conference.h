@@ -5,6 +5,7 @@
 #include <QString>
 #include <QUrl>
 #include <QSharedPointer>
+#include <QDir>
 
 namespace cfs
 {
@@ -47,6 +48,10 @@ private:
                const QString &city,
                const QUrl &data_url,
                QObject *parent = nullptr);
+
+    static QString compute_conference_code(const QUrl &data_url);
+    static QUrl compute_data_location(QString code);
+    static QDir get_existing_data_dir();
 
 private:
     int id_;

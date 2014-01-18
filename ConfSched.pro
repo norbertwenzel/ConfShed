@@ -13,7 +13,9 @@ CONFIG += c++11
 
 SOURCES += src/ConfSched.cpp \
     src/conf_scheduler.cpp \
-    src/conference.cpp
+    src/conference.cpp \
+    src/sync_downloader.cpp \
+    src/qt_downloader.cpp
 
 OTHER_FILES += qml/ConfSched.qml \
     qml/cover/CoverPage.qml \
@@ -25,5 +27,8 @@ OTHER_FILES += qml/ConfSched.qml \
 
 HEADERS += \
     src/conf_scheduler.h \
-    src/conference.h
+    src/conference.h \
+    src/sync_downloader.h \
+    src/qt_downloader.h
 
+QT += network
