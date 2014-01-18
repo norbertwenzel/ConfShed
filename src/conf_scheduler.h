@@ -1,5 +1,5 @@
-#ifndef CONF_SCHEDULER_H
-#define CONF_SCHEDULER_H
+#ifndef CFS_CONF_SCHEDULER_H
+#define CFS_CONF_SCHEDULER_H
 
 #include <QObject>
 #include <QUrl>
@@ -12,6 +12,9 @@ class conf_scheduler : public QObject
     Q_OBJECT
 public:
     explicit conf_scheduler(QObject *parent = nullptr);
+#ifndef NDEBUG
+    ~conf_scheduler();
+#endif
 
 signals:
     void conferenceAdded(const QUrl &conf_data_url) const;
@@ -22,4 +25,4 @@ public slots:
 
 } //namespace cfs
 
-#endif // CONF_SCHEDULER_H
+#endif //CFS_CONF_SCHEDULER_H

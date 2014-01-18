@@ -12,7 +12,8 @@ CONFIG += sailfishapp
 CONFIG += c++11
 
 SOURCES += src/ConfSched.cpp \
-    src/conf_scheduler.cpp
+    src/conf_scheduler.cpp \
+    src/conference.cpp
 
 OTHER_FILES += qml/ConfSched.qml \
     qml/cover/CoverPage.qml \
@@ -23,5 +24,6 @@ OTHER_FILES += qml/ConfSched.qml \
     qml/pages/add_conference_page.qml
 
 HEADERS += \
-    src/conf_scheduler.h
+    src/conf_scheduler.h \
+    src/conference.h
 
