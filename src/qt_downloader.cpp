@@ -59,7 +59,7 @@ void qt_downloader::finished(QNetworkReply *data)
         qCritical() << data->errorString();
         emit error(QString::fromLocal8Bit("Failed to download conference data."));
     }
-    else
+    /*else
     {
         std::ostringstream msg;
         const auto &headers = data->rawHeaderList();
@@ -69,7 +69,7 @@ void qt_downloader::finished(QNetworkReply *data)
             msg << h.data() << ": " << data->rawHeader(h).data() << std::endl;
         });
         qDebug() << msg.str().c_str();
-    }
+    }*/
 
     if(no_error)
     {
