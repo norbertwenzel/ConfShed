@@ -38,17 +38,18 @@
 
 #include <sailfishapp.h>
 
+#include "src/conf_scheduler.h"
 
 int main(int argc, char *argv[])
 {
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
-    //qmlRegisterType<sft::event>("org.fosdem.events", 0, 1, "ConfEvent");
+    //qmlRegisterType<cfs::conf_scheduler>("ConferenceScheduler", 0, 1, "ConfSched");
 
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
-    //set the c++ data as a model
-    //sft::event_list_model event_list(get_data());
-    //view->rootContext()->setContextProperty("eventModel", &event_list);
+    //make the c++ application available in qml
+    cfs::conf_scheduler sched;
+    view->rootContext()->setContextProperty("conf_sched", &sched);
 
     view->setSource(SailfishApp::pathTo("qml/ConfSched.qml"));
     view->show();

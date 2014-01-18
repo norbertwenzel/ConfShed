@@ -42,9 +42,14 @@ Page {
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
             MenuItem {
-                text: "Show Page 2"
-                onClicked: pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
+                text: "Add conference"
+                onClicked: conf_sched.addConference(Qt.resolvedUrl("cover/CoverPage.qml"))
             }
+        }
+
+        Connections {
+            target: conf_sched
+            onConferenceAdded: console.log("Conference added: " + conf_data_url)
         }
 
         // Tell SilicaFlickable the height of its content.
@@ -58,6 +63,7 @@ Page {
             width: page.width
             spacing: Theme.paddingLarge
             PageHeader {
+                id: page_header
                 title: "UI Template"
             }
             Label {
