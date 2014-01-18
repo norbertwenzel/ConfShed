@@ -19,7 +19,8 @@ OTHER_FILES += qml/ConfSched.qml \
     qml/pages/FirstPage.qml \
     rpm/ConfSched.spec \
     rpm/ConfSched.yaml \
-    ConfSched.desktop
+    ConfSched.desktop \
+    qml/pages/add_conference_page.qml
 
 HEADERS += \
     src/conf_scheduler.h

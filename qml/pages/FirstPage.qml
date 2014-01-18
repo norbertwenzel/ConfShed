@@ -43,13 +43,8 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: "Add conference"
-                onClicked: conf_sched.addConference(Qt.resolvedUrl("cover/CoverPage.qml"))
+                onClicked: pageStack.push(Qt.resolvedUrl("add_conference_page.qml"))
             }
-        }
-
-        Connections {
-            target: conf_sched
-            onConferenceAdded: console.log("Conference added: " + conf_data_url)
         }
 
         // Tell SilicaFlickable the height of its content.
