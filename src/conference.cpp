@@ -39,7 +39,8 @@ conference::conference(const QString &title,
     subtitle_(subtitle),
     venue_(venue),
     city_(city),
-    code_(compute_conference_code(remote_data_url))
+    code_(compute_conference_code(remote_data_url)),
+    remote_file_(remote_data_url)
 {
     id_ = store();
 }
@@ -120,17 +121,17 @@ int conference::store()
         qDebug() << db;
     });*/
 
-    static const auto db_driver = "QSQLITE";
+    static const auto DB_DRIVER = "QSQLITE";
 
-    if(!QSqlDatabase::isDriverAvailable(db_driver))
+    if(!QSqlDatabase::isDriverAvailable(DB_DRIVER))
     {
         std::ostringstream msg;
-        msg << "Missing driver for database " << db_driver;
+        msg << "Missing driver for database " << DB_DRIVER;
         qFatal(msg.str().c_str());
         throw std::runtime_error("Database driver missing.");
     }
 
-    auto db = QSqlDatabase::addDatabase(db_driver);
+    auto db = QSqlDatabase::addDatabase(DB_DRIVER);
     db.setDatabaseName(compute_file_location("data", DB_FILE_EXT).toString());
     auto is_open = db.open();
 
@@ -138,18 +139,19 @@ int conference::store()
     {
         qDebug() << "Database " << db.databaseName() << " is open";
 
-        auto db_res = db.exec("CREATE TABLE IF NOT EXISTS confs(Id INTEGER PRIMARY KEY, Title TEXT, Venue TEXT, City TEXT, Code TEXT UNIQUE)");
+        auto db_res = db.exec("CREATE TABLE IF NOT EXISTS confs(Id INTEGER PRIMARY KEY, Title TEXT, Venue TEXT, City TEXT, Code TEXT UNIQUE, Url TEXT)");
         if(db_res.lastError().type() == QSqlError::NoError)
         {
             QSqlQuery query;
-            query.prepare("INSERT OR ABORT INTO confs (Title, Venue, City, Code) VALUES (:title, :venue, :city, :code)");
+            query.prepare("INSERT OR ABORT INTO confs (Title, Venue, City, Code, Url) VALUES (:title, :venue, :city, :code, :url)");
             query.bindValue(":title", title_);
             query.bindValue(":venue", venue_);
             query.bindValue(":city", city_);
             query.bindValue(":code", code_);
+            query.bindValue(":url", remote_file_);
 
             if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
-            //return query.lastInsertId().toInt();
+            return query.lastInsertId().toInt();
 
             db_res = db.exec("SELECT * FROM confs");
             while(db_res.next())

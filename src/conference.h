@@ -20,6 +20,7 @@ class conference : public QObject
     Q_PROPERTY(QString venue READ venue CONSTANT)
     Q_PROPERTY(QString city READ city CONSTANT)
     Q_PROPERTY(QString code READ code CONSTANT)
+    Q_PROPERTY(QUrl remote_file READ remote_file CONSTANT)
 
 public:
     explicit conference(QObject *parent = nullptr);
@@ -36,6 +37,7 @@ public:
     QString venue() const { return venue_; }
     QString city() const { return city_; }
     QString code() const { return code_; }
+    QUrl remote_file() const { return remote_file_; }
 
 signals:
 
@@ -66,6 +68,7 @@ private:
     QString venue_;
     QString city_;
     QString code_;
+    QUrl remote_file_;
 };
 
 } //namespace cfs
