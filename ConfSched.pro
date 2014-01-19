@@ -20,11 +20,11 @@ SOURCES += src/ConfSched.cpp \
 
 OTHER_FILES += qml/ConfSched.qml \
     qml/cover/CoverPage.qml \
-    qml/pages/FirstPage.qml \
     rpm/ConfSched.spec \
     rpm/ConfSched.yaml \
     ConfSched.desktop \
-    qml/pages/add_conference_page.qml
+    qml/pages/ConferenceOverviewPage.qml \
+    qml/pages/AddConferencePage.qml
 
 HEADERS += \
     src/conf_scheduler.h \

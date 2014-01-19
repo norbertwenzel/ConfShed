@@ -5,16 +5,13 @@ import Sailfish.Silica 1.0
 Dialog {
     id: page
 
-    canAccept: false
-    onAccepted: conf_sched.addConference(url_input.text)
+    canAccept: true
+    onAccepted: {
+        conf_sched.addConference(url_input.text.length > 0 ? url_input.text : "https://fosdem.org/2014/schedule/xml");
+    }
 
     SilicaFlickable {
         anchors.fill: parent
-
-        Connections {
-            target: conf_sched
-            onConferenceAdded: console.log("Conference added: " + conf_data_url)
-        }
 
         // Tell SilicaFlickable the height of its content.
         contentHeight: column.height
@@ -43,7 +40,7 @@ Dialog {
                 placeholderText: "Enter Pentabarf URL"
                 width: parent.width
                 focus: true
-                //text: "https://fosdem.org/2014/schedule/xml"
+                //text: newConfDataUrl.length > 0 ? newConfDataUrl : ""
                 inputMethodHints: Qt.ImhUrlCharactersOnly
 
                 onTextChanged: { errorHighlight = false }

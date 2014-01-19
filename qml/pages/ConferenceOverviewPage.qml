@@ -35,6 +35,16 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
+    function add_conference_dialog(error_url) {
+        var dialog = pageStack.push(Qt.resolvedUrl("AddConferencePage.qml"));
+        /*dialog.onNewConfDataUrlChanged.connect(function() { console.log("the value changed to " + dialog.newConfDataUrl) });
+        dialog.accepted.connect(
+            function() {
+                console.log("The url set by the user: " + dialog.newConfDataUrl);
+                conf_sched.addConference(dialog.newConfDataUrl)
+            });*/
+    }
+
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
         anchors.fill: parent
@@ -43,7 +53,20 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: "Add conference"
-                onClicked: pageStack.push(Qt.resolvedUrl("add_conference_page.qml"))
+                onClicked: add_conference_dialog();
+            }
+        }
+
+        Connections {
+            target: conf_sched
+            onConferenceAdded: {
+                console.log("Conference added: " + title);
+                text_pane.text = title
+            }
+            onError: {
+                console.error(message);
+                text_pane.text = message
+                text_pane.color = "red";
             }
         }
 
@@ -59,13 +82,23 @@ Page {
             spacing: Theme.paddingLarge
             PageHeader {
                 id: page_header
-                title: "UI Template"
+                title: "Conferences"
             }
             Label {
+                id: text_pane
                 x: Theme.paddingLarge
                 text: "Hello Sailors"
                 color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeExtraLarge
+                font.pixelSize: Theme.fontSizeSmall
+
+                /*Connections {
+                    target: conf_sched
+                    onConferenceAdded: text_pane.text = title;
+                    onError: {
+                        text_pane.text = message
+                        text_pane.color = "red"
+                    }
+                }*/
             }
         }
     }
