@@ -18,6 +18,8 @@ public:
     ~conf_scheduler();
 #endif
 
+    Q_INVOKABLE int get_num_conferences() const;
+
 signals:
     void conferenceAdded(conference *conf) const;
     void error(const QString &message) const;

@@ -45,6 +45,13 @@ Page {
             });*/
     }
 
+    Component.onCompleted: {
+        if(conf_sched.get_num_conferences() === 1)
+        {
+            text_pane.text = "only one conf available"
+        }
+    }
+
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
         anchors.fill: parent

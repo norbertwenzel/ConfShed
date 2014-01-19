@@ -20,6 +20,12 @@ conf_scheduler::~conf_scheduler()
 }
 #endif
 
+int conf_scheduler::get_num_conferences() const
+{
+    //TODO: add the database as a private member in here and actually read the value
+    return 1;
+}
+
 void conf_scheduler::addConference(const QUrl &conf_data_url)
 {
     qDebug() << conf_data_url;
