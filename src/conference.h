@@ -19,7 +19,7 @@ class conference : public QObject
     Q_PROPERTY(QString subtitle READ subtitle CONSTANT)
     Q_PROPERTY(QString venue READ venue CONSTANT)
     Q_PROPERTY(QString city READ city CONSTANT)
-    Q_PROPERTY(QUrl data_url READ data_url CONSTANT)
+    Q_PROPERTY(QString code READ code CONSTANT)
 
 public:
     explicit conference(QObject *parent = nullptr);
@@ -35,7 +35,7 @@ public:
     QString subtitle() const { return subtitle_; }
     QString venue() const { return venue_; }
     QString city() const { return city_; }
-    QUrl data_url() const { return data_url_; }
+    QString code() const { return code_; }
 
 signals:
 
@@ -46,12 +46,18 @@ private:
                const QString &subtitle,
                const QString &venue,
                const QString &city,
-               const QUrl &data_url,
+               const QUrl &remote_data_url,
                QObject *parent = nullptr);
 
-    static QString compute_conference_code(const QUrl &data_url);
-    static QUrl compute_data_location(QString code);
+    static QString compute_conference_code(const QUrl &remote_data_url);
+    static QUrl compute_file_location(QString code, const QString &extension);
     static QDir get_existing_data_dir();
+
+    int store();
+
+    static const int INVALID_CONFERENCE_ID = 0;
+    static const auto DATA_FILE_EXT = ".xml";
+    static const auto DB_FILE_EXT = ".db";
 
 private:
     int id_;
@@ -59,7 +65,7 @@ private:
     QString subtitle_;
     QString venue_;
     QString city_;
-    QUrl data_url_;
+    QString code_;
 };
 
 } //namespace cfs
