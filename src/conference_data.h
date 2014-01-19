@@ -2,6 +2,8 @@
 #define CFS_DETAIL_CONFERENCE_DATA_H
 
 #include <QString>
+#include <QList>
+#include <QDateTime>
 
 class QFile;
 
@@ -16,6 +18,21 @@ struct conference_data
     QString subtitle;
     QString venue;
     QString city;
+
+    struct event_data
+    {
+        int id;
+        QString title;
+        QString subtitle;
+        QString track;
+        QString abstract;
+        QString description;
+        QString room;
+        QList<QString> speaker;
+        QDateTime starttime;
+        QDateTime endtime;
+    };
+    QList<event_data> events;
 };
 
 class conference_parser

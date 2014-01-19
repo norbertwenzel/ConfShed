@@ -2,11 +2,13 @@
 #define CFS_DETAIL_PENTABARF_PARSER_H
 
 #include <QString>
+#include <QList>
 
 #include "conference_data.h"
 
 class QFile;
 class QXmlStreamReader;
+class QDate;
 
 namespace cfs
 {
@@ -30,6 +32,11 @@ private:
     QString parse_conf_city(QXmlStreamReader &xml);
 
     //methods for parsing the conference events data
+    typedef conference_data::event_data event_data;
+    typedef QList<event_data> event_list;
+    event_list parse_events(QXmlStreamReader &xml);
+    event_list parse_events_per_room(QXmlStreamReader &xml, const QDate &date);
+    event_data parse_single_event(QXmlStreamReader &xml, const QDate &date, const QString &room);
 };
 
 } //namespace detail
