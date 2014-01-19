@@ -86,8 +86,8 @@ void qt_downloader::finished(QNetworkReply *data)
             {
                 qDebug() << "Using QTextStream with codec " << charset << " idx: " << idx_left;
                 QTextStream fstream(&file);
-                fstream.setGenerateByteOrderMark(true);
                 fstream.setCodec(charset.toLocal8Bit().data());
+                fstream.setGenerateByteOrderMark(true);
                 fstream << data->readAll();
             }
             else
