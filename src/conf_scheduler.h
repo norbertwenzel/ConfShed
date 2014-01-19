@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QUrl>
 
+#include "conference.h"
+
 namespace cfs
 {
 
@@ -17,7 +19,7 @@ public:
 #endif
 
 signals:
-    void conferenceAdded(const QUrl &conf_data_url) const;
+    void conferenceAdded(conference *conf) const;
     void error(const QString &message) const;
 
 public slots:

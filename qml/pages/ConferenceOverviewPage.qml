@@ -30,7 +30,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-
+import ConfSched 0.1
 
 Page {
     id: page
@@ -60,8 +60,8 @@ Page {
         Connections {
             target: conf_sched
             onConferenceAdded: {
-                console.log("Conference added: " + title);
-                text_pane.text = title
+                console.log("Conference added: " + conf);
+                text_pane.text = conf.title + " in " + conf.city
             }
             onError: {
                 console.error(message);

@@ -26,7 +26,7 @@ void conf_scheduler::addConference(const QUrl &conf_data_url)
     try
     {
         auto conf = conference::from_file(conf_data_url, this);
-        emit conferenceAdded(conf_data_url);
+        emit conferenceAdded(conf);
     }
     catch(const std::exception &e)
     {

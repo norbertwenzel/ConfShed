@@ -41,11 +41,13 @@
 #include <sailfishapp.h>
 
 #include "src/conf_scheduler.h"
+#include "src/conference.h"
 
 int main(int argc, char *argv[])
 {
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
-    //qmlRegisterType<cfs::conf_scheduler>("ConferenceScheduler", 0, 1, "ConfSched");
+
+    qmlRegisterType<cfs::conference>("ConfSched", 0, 1, "Conference");
 
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
