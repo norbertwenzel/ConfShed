@@ -45,6 +45,7 @@
 
 int main(int argc, char *argv[])
 {
+    //call this at the beginning so all qt stuff is initialized, eg. QtStandardPaths
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
 
     qmlRegisterType<cfs::conference>("ConfSched", 0, 1, "Conference");
