@@ -8,17 +8,23 @@
 
 using cfs::conf_scheduler;
 
+namespace cfs
+{
+class storage
+{
+};
+}
+
 conf_scheduler::conf_scheduler(QObject *parent) :
     QObject(parent)
 {
 }
 
-#ifndef NDEBUG
 conf_scheduler::~conf_scheduler()
 {
+    //empty dtor because of forward declared storage in unique_ptr
     qDebug();
 }
-#endif
 
 int conf_scheduler::get_num_conferences() const
 {
