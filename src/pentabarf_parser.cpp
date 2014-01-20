@@ -258,7 +258,7 @@ pentabarf_parser::event_data pentabarf_parser::parse_single_event(QXmlStreamRead
         assert(event.id != 0);
         assert(event.title.size() > 0);
         //assert(event.subtitle.size() > 0); optional value
-        assert(event.track.size() > 0);
+        //assert(event.track.size() > 0); optional value
         //assert(event.abstract.size() > 0); optional value
         //assert(event.description.size() > 0); optional value
         assert(event.room.size() > 0);
