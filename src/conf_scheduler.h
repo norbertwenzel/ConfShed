@@ -5,13 +5,17 @@
 
 #include <QObject>
 #include <QUrl>
+#include <QDir>
 
 #include "conference.h"
 
 namespace cfs
 {
 
+namespace detail
+{
 class storage;
+} //namespace detail
 
 class conf_scheduler : public QObject
 {
@@ -30,7 +34,11 @@ public slots:
     void addConference(const QUrl &conf_data_url);
 
 private:
-    std::unique_ptr<storage> storage_;
+    static QDir get_existing_data_dir();
+
+private:
+    static const QString STORAGE_IDENTIFIER;
+    std::unique_ptr<detail::storage> storage_;
 };
 
 } //namespace cfs
