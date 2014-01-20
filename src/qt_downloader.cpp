@@ -75,7 +75,7 @@ void qt_downloader::finished(QNetworkReply *data)
     {
         const auto &content_type = data->header(QNetworkRequest::ContentTypeHeader).toString();
         qDebug() << "content_type: " << content_type;
-        const bool is_text = content_type.startsWith("text");
+        const bool is_text = content_type.startsWith("text", Qt::CaseInsensitive) || content_type.contains("xml", Qt::CaseInsensitive);
         const auto idx_left = content_type.length() - content_type.lastIndexOf('=') - 1;
         const QString charset = idx_left > 0 && idx_left < content_type.length() ? content_type.rightRef(idx_left).toString() : QString("utf-8"); //assume utf8 encoding
 
