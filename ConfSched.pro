@@ -38,3 +38,5 @@ HEADERS += \
 
 QT += network
 QT += sql
+
+DEFINES *= QT_USE_QSTRINGBUILDER
