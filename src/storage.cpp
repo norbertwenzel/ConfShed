@@ -73,7 +73,7 @@ public:
     {
         assert(db_.open());
 
-        QSqlQuery query;
+        QSqlQuery query(db_);
         query.prepare("INSERT OR REPLACE INTO confs (Title, Venue, City, Code, Url) VALUES (:title, :venue, :city, :code, :url)");
         query.bindValue(":title", d.title);
         query.bindValue(":venue", d.venue);
@@ -83,6 +83,32 @@ public:
 
         if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
         return query.lastInsertId().toInt();
+    }
+
+    std::vector<conference_data> get_conferences()
+    {
+        assert(db_.open());
+
+        QSqlQuery query(db_);
+        query.prepare("SELECT * FROM confs");
+        if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
+
+        enum { ID, TITLE, VENUE, CITY, CODE, URL };
+        std::vector<conference_data> results;
+        while(query.next())
+        {
+            conference_data d;
+            d.id = query.value(ID).toInt();
+            d.title = query.value(TITLE).toString();
+            d.venue = query.value(VENUE).toString();
+            d.city = query.value(CITY).toString();
+            d.code = query.value(CODE).toString();
+            d.remote_data = query.value(URL).toString();
+
+            results.push_back(std::move(d));
+        }
+
+        return results;
     }
 
 private:
@@ -119,7 +145,7 @@ int storage::get_num_conferences() const
 std::vector<conference_data> storage::get_conferences() const
 {
     assert(impl_);
-    return std::vector<conference_data>();
+    return impl_->get_conferences();
 }
 
 int storage::add_or_update_conference(const conference_data &d)

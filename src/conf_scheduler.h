@@ -25,6 +25,7 @@ public:
     ~conf_scheduler();
 
     Q_INVOKABLE int get_num_conferences() const;
+    Q_INVOKABLE QList<QObject*> get_all_conferences() const;
 
 signals:
     void conferenceAdded(conference *conf) const;

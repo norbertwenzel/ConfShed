@@ -46,6 +46,42 @@ int conf_scheduler::get_num_conferences() const
     }
 }
 
+QList<QObject*> conf_scheduler::get_all_conferences() const
+{
+    QList<QObject*> all_confs;
+    try
+    {
+        assert(storage_);
+        const auto &all_data = storage_->get_conferences();
+        qDebug() << "Trying to load" << all_data.size() << "conferences.";
+
+        all_confs.reserve(all_data.size());
+        std::for_each(std::begin(all_data), std::end(all_data),
+        [&](decltype(*std::begin(all_data)) &d)
+        {
+            all_confs.push_back(new conference(d, const_cast<conf_scheduler*>(this)));
+        });
+
+        assert(all_confs.size() == get_num_conferences());
+    }
+    catch(const std::exception &e)
+    {
+        emit error(QString::fromLocal8Bit(e.what()));
+        all_confs.clear();
+    }
+
+#ifndef NDEBUG
+    //make sure we have only cfs::conference* in that list
+    std::for_each(std::begin(all_confs), std::end(all_confs),
+    [](decltype(*std::begin(all_confs)) &c)
+    {
+        assert(qobject_cast<cfs::conference*>(c));
+    });
+#endif
+
+    return all_confs;
+}
+
 void conf_scheduler::addConference(const QUrl &remote_conf_data_url)
 {
     qDebug() << remote_conf_data_url;
