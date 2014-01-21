@@ -4,6 +4,7 @@
 #include <QString>
 #include <QList>
 #include <QDateTime>
+#include <QUrl>
 
 class QFile;
 
@@ -18,6 +19,11 @@ struct conference_data
     QString subtitle;
     QString venue;
     QString city;
+
+    //needed for db storage
+    int id;
+    QString code;
+    QUrl remote_data;
 
     struct event_data
     {

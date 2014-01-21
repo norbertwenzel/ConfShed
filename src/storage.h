@@ -22,6 +22,8 @@ public:
     int get_num_conferences() const;
     std::vector<conference_data> get_conferences() const;
 
+    int add_or_update_conference(const conference_data &d);
+
 private:
     class impl;
     std::unique_ptr<impl> impl_;

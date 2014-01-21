@@ -35,6 +35,7 @@ public slots:
 
 private:
     static QDir get_existing_data_dir();
+    static QUrl get_data_file_location(QString code, const QString &ext);
 
 private:
     static const QString STORAGE_IDENTIFIER;

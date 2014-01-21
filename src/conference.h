@@ -7,6 +7,8 @@
 #include <QSharedPointer>
 #include <QDir>
 
+#include "conference_data.h"
+
 namespace cfs
 {
 
@@ -24,12 +26,11 @@ class conference : public QObject
 
 public:
     explicit conference(QObject *parent = nullptr);
+    explicit conference(const detail::conference_data &cd,
+                        QObject *parent = nullptr);
 #ifndef NDEBUG
     ~conference();
 #endif
-
-    static conference* from_file(const QUrl &data_url,
-                                 QObject *parent);
 
     int conf_id() const { return id_; }
     QString title() const { return title_; }
@@ -39,29 +40,15 @@ public:
     QString code() const { return code_; }
     QUrl remote_file() const { return remote_file_; }
 
+    static QString compute_code(const QUrl &remote_data_url);
+
 signals:
 
 public slots:
 
 private:
-    conference(const QString &title,
-               const QString &subtitle,
-               const QString &venue,
-               const QString &city,
-               const QUrl &remote_data_url,
-               QObject *parent = nullptr);
-
-    static QString compute_conference_code(const QUrl &remote_data_url);
-    static QUrl compute_file_location(QString code, const QString &extension);
-    static QDir get_existing_data_dir();
-
-    int store();
-
     static const int INVALID_CONFERENCE_ID = 0;
-    static const auto DATA_FILE_EXT = ".xml";
-    static const auto DB_FILE_EXT = ".db";
 
-private:
     int id_;
     QString title_;
     QString subtitle_;

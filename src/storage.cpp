@@ -69,6 +69,22 @@ public:
         throw std::runtime_error("Failed to read from database.");
     }
 
+    int add_or_update_conference(const conference_data &d)
+    {
+        assert(db_.open());
+
+        QSqlQuery query;
+        query.prepare("INSERT OR REPLACE INTO confs (Title, Venue, City, Code, Url) VALUES (:title, :venue, :city, :code, :url)");
+        query.bindValue(":title", d.title);
+        query.bindValue(":venue", d.venue);
+        query.bindValue(":city", d.city);
+        query.bindValue(":code", d.code);
+        query.bindValue(":url", d.remote_data);
+
+        if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
+        return query.lastInsertId().toInt();
+    }
+
 private:
     void create_db_if_necessary()
     {
@@ -104,4 +120,10 @@ std::vector<conference_data> storage::get_conferences() const
 {
     assert(impl_);
     return std::vector<conference_data>();
+}
+
+int storage::add_or_update_conference(const conference_data &d)
+{
+    assert(impl_);
+    return impl_->add_or_update_conference(d);
 }
