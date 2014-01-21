@@ -46,9 +46,14 @@ Page {
     }
 
     Component.onCompleted: {
-        if(conf_sched.get_num_conferences() === 1)
+        var confs = conf_sched.get_all_conferences();
+        if(confs.length === 1)
         {
             text_pane.text = "only one conf available"
+        }
+        else
+        {
+            text_pane.text = "there are " + confs.length + " conferences waiting for you"
         }
     }
 
