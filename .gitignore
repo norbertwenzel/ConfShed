@@ -1,6 +1,6 @@
 # Project specific #
 ####################
-*.user
+*.pro.user
 
 # Compiled source #
 ###################
