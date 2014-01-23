@@ -22,7 +22,7 @@ class conference_data;
 class pentabarf_parser : public conference_parser
 {
 public:
-    std::unique_ptr<conference_data> parse(QFile &file);
+    std::unique_ptr<conference_data> parse(QFile &file, conference_parser::parsing_options p);
 
 private:
     //general methods for helping with parsing

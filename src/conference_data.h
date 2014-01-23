@@ -48,7 +48,12 @@ class conference_parser
 public:
     virtual ~conference_parser(){}
 
-    virtual std::unique_ptr<conference_data> parse(QFile &file) = 0;
+    enum parsing_options
+    {
+        PARSE_COMPLETE,
+        PARSE_WITHOUT_EVENTS
+    };
+    virtual std::unique_ptr<conference_data> parse(QFile &file, parsing_options p = PARSE_COMPLETE) = 0;
 };
 
 } //namespace detail

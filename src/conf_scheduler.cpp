@@ -98,7 +98,7 @@ void conf_scheduler::addConference(const QUrl &remote_conf_data_url)
 
         download_conf_data(remote_conf_data_url, local_data_file);
         //TODO parse the conference data *only*
-        const auto data = parse_conference(local_data_file);
+        const auto data = parse_conference_header(local_data_file);
 
         //add the conference to the database
         data->code = code;
@@ -143,7 +143,7 @@ void conf_scheduler::updateAllConferences()
 
             download_conf_data(d.remote_data, local_data_file);
             //TODO parse the conference data *only*
-            const auto &data = parse_conference(local_data_file);
+            const auto &data = parse_conference_header(local_data_file);
             assert(data);
 
             //update the conference in the database
@@ -178,7 +178,22 @@ void conf_scheduler::download_conf_data(const QUrl &remote_conf_data_url, const 
     }
 }
 
-std::unique_ptr<cfs::detail::conference_data> conf_scheduler::parse_conference(const QUrl &local_data_file) const
+std::unique_ptr<cfs::detail::conference_data> conf_scheduler::parse_conference_header(const QUrl &local_data_file) const
+{
+    const auto parser = std::unique_ptr<detail::conference_parser>(new detail::pentabarf_parser());
+
+    QFile file(local_data_file.path());
+    if(file.exists())
+    {
+        return parser->parse(file, detail::conference_parser::PARSE_WITHOUT_EVENTS);
+    }
+    else
+    {
+        throw std::runtime_error("Failed to read conference data.");
+    }
+}
+
+std::unique_ptr<cfs::detail::conference_data> conf_scheduler::parse_conference_complete(const QUrl &local_data_file) const
 {
     const auto parser = std::unique_ptr<detail::conference_parser>(new detail::pentabarf_parser());
 

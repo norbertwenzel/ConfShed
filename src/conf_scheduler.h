@@ -43,7 +43,8 @@ private:
     static QUrl get_data_file_location(QString code, const QString &ext);
 
     void download_conf_data(const QUrl &remote_conf_data_url, const QUrl &local_data_file) const;
-    std::unique_ptr<detail::conference_data> parse_conference(const QUrl &local_data_file) const;
+    std::unique_ptr<detail::conference_data> parse_conference_header(const QUrl &local_data_file) const;
+    std::unique_ptr<detail::conference_data> parse_conference_complete(const QUrl &local_data_file) const;
 
 private:
     static const QString STORAGE_IDENTIFIER;

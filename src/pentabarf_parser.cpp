@@ -12,7 +12,7 @@
 using cfs::detail::conference_data;
 using cfs::detail::pentabarf_parser;
 
-std::unique_ptr<conference_data> pentabarf_parser::parse(QFile &file)
+std::unique_ptr<conference_data> pentabarf_parser::parse(QFile &file, conference_parser::parsing_options p)
 {
     if(file.open(QFile::ReadOnly | QFile::Text))
     {
@@ -33,8 +33,13 @@ std::unique_ptr<conference_data> pentabarf_parser::parse(QFile &file)
                     //check that we do not overwrite existing conf_data
                     assert(!d || d->events.size() == 0);
                     d = parse_conf(xml);
+                    if(p == conference_parser::PARSE_WITHOUT_EVENTS)
+                    {
+                        //terminate early if we do not need to parse all events
+                        return d;
+                    }
                 }
-                else if(xml.name() == EVENT_TAG)
+                else if(p != conference_parser::PARSE_WITHOUT_EVENTS && xml.name() == EVENT_TAG)
                 {
                     assert(d); //conference data comes before event data in pentabarf xml
                     d->events += parse_events(xml);
