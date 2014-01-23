@@ -74,8 +74,9 @@ public:
         assert(db_.open());
 
         QSqlQuery query(db_);
-        query.prepare("INSERT OR REPLACE INTO confs (Title, Venue, City, Code, Url) VALUES (:title, :venue, :city, :code, :url)");
+        query.prepare("INSERT OR REPLACE INTO confs (Title, Subtitle, Venue, City, Code, Url) VALUES (:title, :subtitle, :venue, :city, :code, :url)");
         query.bindValue(":title", d.title);
+        query.bindValue(":subtitle", d.subtitle);
         query.bindValue(":venue", d.venue);
         query.bindValue(":city", d.city);
         query.bindValue(":code", d.code);
@@ -93,13 +94,14 @@ public:
         query.prepare("SELECT * FROM confs");
         if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
 
-        enum { ID, TITLE, VENUE, CITY, CODE, URL };
+        enum { ID, TITLE, VENUE, CITY, CODE, URL, SUBTITLE };
         std::vector<conference_data> results;
         while(query.next())
         {
             conference_data d;
             d.id = query.value(ID).toInt();
             d.title = query.value(TITLE).toString();
+            d.subtitle = query.value(SUBTITLE).toString();
             d.venue = query.value(VENUE).toString();
             d.city = query.value(CITY).toString();
             d.code = query.value(CODE).toString();
@@ -116,7 +118,7 @@ private:
     {
         assert(db_.open());
 
-        auto res = db_.exec("CREATE TABLE IF NOT EXISTS confs(Id INTEGER PRIMARY KEY, Title TEXT, Venue TEXT, City TEXT, Code TEXT UNIQUE, Url TEXT)");
+        auto res = db_.exec("CREATE TABLE IF NOT EXISTS confs(Id INTEGER PRIMARY KEY, Title TEXT, Venue TEXT, City TEXT, Code TEXT UNIQUE, Url TEXT, Subtitle TEXT)");
         //TODO: throw exception, but check where that exception is caught
         assert(res.lastError().type() == QSqlError::NoError);
     }
