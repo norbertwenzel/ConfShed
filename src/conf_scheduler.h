@@ -30,11 +30,13 @@ public:
     Q_INVOKABLE cfs::conference_list_model* get_all_conferences() const;
 
 signals:
+    void conferenceListChanged(cfs::conference_list_model *confs) const;
     void conferenceAdded(conference *conf) const;
     void error(const QString &message) const;
 
 public slots:
     void addConference(const QUrl &conf_data_url);
+    void updateAllConferences();
 
 private:
     static QDir get_existing_data_dir();

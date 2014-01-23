@@ -82,33 +82,6 @@ cfs::conference_list_model* conf_scheduler::get_all_conferences() const
     return new cfs::conference_list_model(all_confs, const_cast<conf_scheduler*>(this));
 }
 
-void conf_scheduler::download_conf_data(const QUrl &remote_conf_data_url, const QUrl &local_data_file) const
-{
-    sync_downloader dl;
-    if(dl.download_to(remote_conf_data_url, local_data_file))
-    {
-    }
-    else
-    {
-        throw std::runtime_error((QString("Failed to download ") + remote_conf_data_url.toString()).toLocal8Bit().data());
-    }
-}
-
-std::unique_ptr<cfs::detail::conference_data> conf_scheduler::parse_conference(const QUrl &local_data_file) const
-{
-    const auto parser = std::unique_ptr<detail::conference_parser>(new detail::pentabarf_parser());
-
-    QFile file(local_data_file.path());
-    if(file.exists())
-    {
-        return parser->parse(file);
-    }
-    else
-    {
-        throw std::runtime_error("Failed to read conference data.");
-    }
-}
-
 void conf_scheduler::addConference(const QUrl &remote_conf_data_url)
 {
     qDebug() << remote_conf_data_url;
@@ -148,6 +121,76 @@ void conf_scheduler::addConference(const QUrl &remote_conf_data_url)
     }
 
     emit error("Unknown error adding conference.");
+}
+
+void conf_scheduler::updateAllConferences()
+{
+    qDebug() << __FUNCTION__;
+
+    QList<cfs::conference*> all_confs;
+    try
+    {
+        assert(storage_);
+        const auto &all_data = storage_->get_conferences();
+        qDebug() << "Trying to update" << all_data.size() << "conferences.";
+
+        all_confs.reserve(all_data.size());
+        std::for_each(std::begin(all_data), std::end(all_data),
+        [&](decltype(*std::begin(all_data)) &d)
+        {
+            //compute a valid data file location
+            const auto &local_data_file = get_data_file_location(d.code, ".xml");
+
+            download_conf_data(d.remote_data, local_data_file);
+            //TODO parse the conference data *only*
+            const auto &data = parse_conference(local_data_file);
+            assert(data);
+
+            //update the conference in the database
+            data->code = d.code;
+            data->remote_data = d.remote_data;
+            data->id = storage_->add_or_update_conference(*data);
+
+            all_confs.push_back(new conference(*data, const_cast<conf_scheduler*>(this)));
+        });
+
+        assert(all_confs.size() == get_num_conferences());
+    }
+    catch(const std::exception &e)
+    {
+        emit error(QString::fromLocal8Bit(e.what()));
+        all_confs.clear();
+        return;
+    }
+
+    emit conferenceListChanged(new cfs::conference_list_model(all_confs, const_cast<conf_scheduler*>(this)));
+}
+
+void conf_scheduler::download_conf_data(const QUrl &remote_conf_data_url, const QUrl &local_data_file) const
+{
+    sync_downloader dl;
+    if(dl.download_to(remote_conf_data_url, local_data_file))
+    {
+    }
+    else
+    {
+        throw std::runtime_error((QString("Failed to download ") + remote_conf_data_url.toString()).toLocal8Bit().data());
+    }
+}
+
+std::unique_ptr<cfs::detail::conference_data> conf_scheduler::parse_conference(const QUrl &local_data_file) const
+{
+    const auto parser = std::unique_ptr<detail::conference_parser>(new detail::pentabarf_parser());
+
+    QFile file(local_data_file.path());
+    if(file.exists())
+    {
+        return parser->parse(file);
+    }
+    else
+    {
+        throw std::runtime_error("Failed to read conference data.");
+    }
 }
 
 QDir conf_scheduler::get_existing_data_dir()
