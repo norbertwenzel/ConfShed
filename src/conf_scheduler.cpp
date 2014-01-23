@@ -135,6 +135,8 @@ void conf_scheduler::updateAllConferences()
         qDebug() << "Trying to update" << all_data.size() << "conferences.";
 
         all_confs.reserve(all_data.size());
+
+        //TODO: this should maybe run concurrenty
         std::for_each(std::begin(all_data), std::end(all_data),
         [&](decltype(*std::begin(all_data)) &d)
         {
