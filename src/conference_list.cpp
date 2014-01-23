@@ -1,6 +1,7 @@
 #include "conference_list.h"
 
 #include <cassert>
+#include <algorithm>
 
 #include "conference.h"
 
@@ -70,14 +71,10 @@ QVariant conference_list_model::data(const QModelIndex &index, int role) const
 
 cfs::conference* conference_list_model::get(const int id) const
 {
-    return nullptr;
-    /*std::clog << __FUNCTION__ << "(" << id << ")" << std::endl;
-    const auto &it = std::find_if(std::begin(events_), std::end(events_),
-         [&id](decltype(*std::begin(events_)) &e)
-         {
-            return e->event_id() == id;
-         });
-    std::clog << "Item '" << id << "' found: " << std::boolalpha <<
-                 (it != std::end(events_)) << std::endl;
-    return it != std::end(events_) ? (*it).data() : throw std::runtime_error("id not found");*/
+    const auto result_iter = std::find_if(std::begin(data_), std::end(data_),
+                            [=](decltype(*std::begin(data_)) &conf)
+                            {
+                                return conf->conf_id() == id;
+                            });
+    return result_iter != std::end(data_) ? *result_iter : nullptr;
 }
