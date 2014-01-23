@@ -42,6 +42,7 @@
 
 #include "src/conf_scheduler.h"
 #include "src/conference.h"
+#include "src/conference_list.h"
 
 int main(int argc, char *argv[])
 {
@@ -49,6 +50,7 @@ int main(int argc, char *argv[])
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
 
     qmlRegisterType<cfs::conference>("ConfSched", 0, 1, "Conference");
+    qmlRegisterType<cfs::conference_list_model>("ConfSched", 0, 1, "ConferenceList");
 
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 

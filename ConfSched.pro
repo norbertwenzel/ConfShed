@@ -17,7 +17,8 @@ SOURCES += src/ConfSched.cpp \
     src/sync_downloader.cpp \
     src/qt_downloader.cpp \
     src/pentabarf_parser.cpp \
-    src/storage.cpp
+    src/storage.cpp \
+    src/conference_list.cpp
 
 OTHER_FILES += qml/ConfSched.qml \
     qml/cover/CoverPage.qml \
@@ -34,7 +35,8 @@ HEADERS += \
     src/qt_downloader.h \
     src/conference_data.h \
     src/pentabarf_parser.h \
-    src/storage.h
+    src/storage.h \
+    src/conference_list.h
 
 QT += network
 QT += sql

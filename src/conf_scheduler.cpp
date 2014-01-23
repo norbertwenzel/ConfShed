@@ -46,9 +46,9 @@ int conf_scheduler::get_num_conferences() const
     }
 }
 
-QList<QObject*> conf_scheduler::get_all_conferences() const
+cfs::conference_list_model* conf_scheduler::get_all_conferences() const
 {
-    QList<QObject*> all_confs;
+    QList<cfs::conference*> all_confs;
     try
     {
         assert(storage_);
@@ -79,7 +79,7 @@ QList<QObject*> conf_scheduler::get_all_conferences() const
     });
 #endif
 
-    return all_confs;
+    return new cfs::conference_list_model(all_confs, const_cast<conf_scheduler*>(this));
 }
 
 void conf_scheduler::addConference(const QUrl &remote_conf_data_url)

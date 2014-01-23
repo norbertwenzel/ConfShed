@@ -8,6 +8,7 @@
 #include <QDir>
 
 #include "conference.h"
+#include "conference_list.h"
 
 namespace cfs
 {
@@ -25,7 +26,7 @@ public:
     ~conf_scheduler();
 
     Q_INVOKABLE int get_num_conferences() const;
-    Q_INVOKABLE QList<QObject*> get_all_conferences() const;
+    Q_INVOKABLE cfs::conference_list_model* get_all_conferences() const;
 
 signals:
     void conferenceAdded(conference *conf) const;
