@@ -4,10 +4,10 @@
 #include <QAbstractListModel>
 #include <QList>
 
+#include "conference.h"
+
 namespace cfs
 {
-
-class conference;
 
 class conference_list_model : public QAbstractListModel
 {
@@ -23,7 +23,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
-    Q_INVOKABLE conference* get(int id) const;
+    Q_INVOKABLE cfs::conference* get(int id) const;
 
 signals:
 
