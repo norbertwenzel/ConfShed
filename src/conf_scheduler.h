@@ -31,11 +31,12 @@ public:
 
 signals:
     void conferenceListChanged(cfs::conference_list_model *confs) const;
-    void conferenceAdded(conference *conf) const;
+    void conferenceAdded(cfs::conference *conf) const;
     void error(const QString &message) const;
 
 public slots:
     void addConference(const QUrl &conf_data_url);
+    void removeConference(cfs::conference *conf);
     void updateAllConferences();
 
 private:

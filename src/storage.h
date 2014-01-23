@@ -23,6 +23,7 @@ public:
     std::vector<conference_data> get_conferences() const;
 
     int add_or_update_conference(const conference_data &d);
+    void delete_conference(int conf_id);
 
 private:
     class impl;

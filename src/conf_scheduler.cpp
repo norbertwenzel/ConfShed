@@ -123,6 +123,41 @@ void conf_scheduler::addConference(const QUrl &remote_conf_data_url)
     emit error("Unknown error adding conference.");
 }
 
+void conf_scheduler::removeConference(cfs::conference *conf)
+{
+    if(!conf)
+    {
+        qDebug() << __FUNCTION__ << "(nullptr)";
+        return;
+    }
+
+    qDebug() << __FUNCTION__ << conf->conf_id() << conf->title();
+
+    try
+    {
+        //delete data file
+        QFile file(get_data_file_location(conf->code(), ".xml").path());
+        assert(file.exists());
+        if(file.exists())
+        {
+            if(!file.remove()) throw std::runtime_error("Could not delete conference data.");
+        }
+
+        //delete item from db
+        assert(storage_);
+        storage_->delete_conference(conf->conf_id());
+
+        //TODO: clear the conf object to free as much memory as possible
+    }
+    catch(const std::exception &e)
+    {
+        emit error(QString::fromLocal8Bit(e.what()));
+        return;
+    }
+
+    emit conferenceListChanged(get_all_conferences());
+}
+
 void conf_scheduler::updateAllConferences()
 {
     qDebug() << __FUNCTION__;

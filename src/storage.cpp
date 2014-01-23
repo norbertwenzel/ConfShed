@@ -86,6 +86,22 @@ public:
         return query.lastInsertId().toInt();
     }
 
+    void delete_conference(int conf_id)
+    {
+        assert(db_.open());
+
+        QSqlQuery query(db_);
+        query.prepare("DELETE FROM confs WHERE Id = :id");
+        query.bindValue(":id", conf_id);
+
+        if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
+        if(query.numRowsAffected() != 1)
+        {
+            assert(query.numRowsAffected() == 0); //it should be impossible to delete two items with the same id
+            throw std::invalid_argument("Tried to delete nonexistent conference.");
+        }
+    }
+
     std::vector<conference_data> get_conferences()
     {
         assert(db_.open());
@@ -154,4 +170,10 @@ int storage::add_or_update_conference(const conference_data &d)
 {
     assert(impl_);
     return impl_->add_or_update_conference(d);
+}
+
+void storage::delete_conference(int conf_id)
+{
+    assert(impl_);
+    impl_->delete_conference(conf_id);
 }
