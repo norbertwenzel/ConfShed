@@ -45,72 +45,90 @@ Page {
             });*/
     }
 
+    function set_conference_list(conf_list) {
+        confOverviewList.model = conf_list;
+    }
+
     Component.onCompleted: {
         var confs = conf_sched.get_all_conferences();
         if(confs.length === 1)
         {
-            text_pane.text = "only one conf available"
+            console.log("only one conf available");
         }
         else
         {
-            text_pane.text = "there are " + confs.length + " conferences waiting for you"
+            console.log("there are " + confs.length + " conferences waiting for you");
         }
+        set_conference_list(confs);
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
-    SilicaFlickable {
+    SilicaListView {
+        id: confOverviewList
+
         anchors.fill: parent
+        model: ConferenceList{}
+
+        header: PageHeader {
+            title: "Conferences"
+        }
 
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
+            MenuItem {
+                text: "Update conferences"
+                onClicked: conf_sched.updateAllConferences();
+                enabled: confOverviewList.model.length > 0
+            }
             MenuItem {
                 text: "Add conference"
                 onClicked: add_conference_dialog();
             }
         }
 
+        ViewPlaceholder {
+            enabled: confOverviewList.count == 0
+            text: "No conferences configured"
+            hintText: "Pull down to add a conference"
+        }
+
         Connections {
             target: conf_sched
             onConferenceAdded: {
                 console.log("Conference added: " + conf);
-                text_pane.text = conf.title + " in " + conf.city
+            }
+            onConferenceListChanged: {
+                console.log("Conference list changed.");
+                set_conference_list(confs);
             }
             onError: {
                 console.error(message);
-                text_pane.text = message
-                text_pane.color = "red";
             }
         }
 
         // Tell SilicaFlickable the height of its content.
-        contentHeight: column.height
+        //contentHeight: column.height
 
-        // Place our content in a Column.  The PageHeader is always placed at the top
-        // of the page, followed by our content.
-        Column {
-            id: column
+        VerticalScrollDecorator {}
 
-            width: page.width
-            spacing: Theme.paddingLarge
-            PageHeader {
-                id: page_header
-                title: "Conferences"
-            }
-            Label {
-                id: text_pane
-                x: Theme.paddingLarge
-                text: "Hello Sailors"
-                color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeSmall
+        delegate: ListItem {
+            contentHeight: column.height
 
-                /*Connections {
-                    target: conf_sched
-                    onConferenceAdded: text_pane.text = title;
-                    onError: {
-                        text_pane.text = message
-                        text_pane.color = "red"
-                    }
-                }*/
+            Column {
+                id: column
+
+                Label {
+                    text: model.title
+                }
+                Label {
+                    text: model.subtitle
+                }
+                Label {
+                    text: model.venue
+                }
+                Label {
+                    text: model.city
+                }
             }
         }
     }
