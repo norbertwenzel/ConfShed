@@ -82,6 +82,33 @@ cfs::conference_list_model* conf_scheduler::get_all_conferences() const
     return new cfs::conference_list_model(all_confs, const_cast<conf_scheduler*>(this));
 }
 
+void conf_scheduler::download_conf_data(const QUrl &remote_conf_data_url, const QUrl &local_data_file) const
+{
+    sync_downloader dl;
+    if(dl.download_to(remote_conf_data_url, local_data_file))
+    {
+    }
+    else
+    {
+        throw std::runtime_error((QString("Failed to download ") + remote_conf_data_url.toString()).toLocal8Bit().data());
+    }
+}
+
+std::unique_ptr<cfs::detail::conference_data> conf_scheduler::parse_conference(const QUrl &local_data_file) const
+{
+    const auto parser = std::unique_ptr<detail::conference_parser>(new detail::pentabarf_parser());
+
+    QFile file(local_data_file.path());
+    if(file.exists())
+    {
+        return parser->parse(file);
+    }
+    else
+    {
+        throw std::runtime_error("Failed to read conference data.");
+    }
+}
+
 void conf_scheduler::addConference(const QUrl &remote_conf_data_url)
 {
     qDebug() << remote_conf_data_url;
@@ -96,41 +123,23 @@ void conf_scheduler::addConference(const QUrl &remote_conf_data_url)
         const auto &local_data_file = get_data_file_location(code, ".xml");
         qDebug() << "data_file: " << local_data_file << ", code: " << code;
 
-        //download the file
-        sync_downloader dl;
-        if(dl.download_to(remote_conf_data_url, local_data_file))
-        {
-            const auto parser = std::unique_ptr<detail::conference_parser>(new detail::pentabarf_parser());
+        download_conf_data(remote_conf_data_url, local_data_file);
+        //TODO parse the conference data *only*
+        const auto data = parse_conference(local_data_file);
 
-            QFile file(local_data_file.path());
-            if(file.exists())
-            {
-                //TODO parse the conference data *only*
-                auto data = parser->parse(file);
+        //add the conference to the database
+        data->code = code;
+        data->remote_data = remote_conf_data_url;
+        data->id = storage_->add_or_update_conference(*data);
 
-                //add the conference to the database
-                data.code = code;
-                data.remote_data = remote_conf_data_url;
-                data.id = storage_->add_or_update_conference(data);
+        //TODO maybe this should be async, so we return as soon as there's data in the DB
+        //TODO parse the conference event data
 
-                //TODO maybe this should be async, so we return as soon as there's data in the DB
-                //TODO parse the conference event data
+        //TODO use boost scope_guard to rollback in case of errors
 
-                //TODO use boost scope_guard to rollback in case of errors
-
-                auto conf = new conference(data, this);
-                emit conferenceAdded(conf);
-                return;
-            }
-            else
-            {
-                throw std::runtime_error("Failed to read conference data.");
-            }
-        }
-        else
-        {
-            throw std::runtime_error((QString("Failed to download ") + remote_conf_data_url.toString()).toLocal8Bit().data());
-        }
+        auto conf = new conference(*data, this);
+        emit conferenceAdded(conf);
+        return;
     }
     catch(const std::exception &e)
     {

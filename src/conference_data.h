@@ -1,6 +1,8 @@
 #ifndef CFS_DETAIL_CONFERENCE_DATA_H
 #define CFS_DETAIL_CONFERENCE_DATA_H
 
+#include <memory>
+
 #include <QString>
 #include <QList>
 #include <QDateTime>
@@ -46,7 +48,7 @@ class conference_parser
 public:
     virtual ~conference_parser(){}
 
-    virtual conference_data parse(QFile &file) = 0;
+    virtual std::unique_ptr<conference_data> parse(QFile &file) = 0;
 };
 
 } //namespace detail

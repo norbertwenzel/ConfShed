@@ -1,6 +1,8 @@
 #ifndef CFS_DETAIL_PENTABARF_PARSER_H
 #define CFS_DETAIL_PENTABARF_PARSER_H
 
+#include <memory>
+
 #include <QString>
 #include <QList>
 
@@ -15,17 +17,19 @@ namespace cfs
 namespace detail
 {
 
+class conference_data;
+
 class pentabarf_parser : public conference_parser
 {
 public:
-    conference_data parse(QFile &file);
+    std::unique_ptr<conference_data> parse(QFile &file);
 
 private:
     //general methods for helping with parsing
     bool extract_text(QXmlStreamReader &xml, const QString &tag, QString &result) const;
 
     //methods for parsing the general conference data
-    conference_data parse_conf(QXmlStreamReader &xml);
+    std::unique_ptr<conference_data> parse_conf(QXmlStreamReader &xml);
     QString parse_conf_title(QXmlStreamReader &xml);
     QString parse_conf_subtitle(QXmlStreamReader &xml);
     QString parse_conf_venue(QXmlStreamReader &xml);

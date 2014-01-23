@@ -12,11 +12,11 @@
 using cfs::detail::conference_data;
 using cfs::detail::pentabarf_parser;
 
-conference_data pentabarf_parser::parse(QFile &file)
+std::unique_ptr<conference_data> pentabarf_parser::parse(QFile &file)
 {
     if(file.open(QFile::ReadOnly | QFile::Text))
     {
-        conference_data d;
+        std::unique_ptr<conference_data> d;
         QXmlStreamReader xml(&file);
         xml.readNext();
         qDebug() << "Opened Pentabarf file with " << xml.documentEncoding() << " encoding.";
@@ -30,11 +30,14 @@ conference_data pentabarf_parser::parse(QFile &file)
             {
                 if(xml.name() == CONF_TAG)
                 {
+                    //check that we do not overwrite existing conf_data
+                    assert(!d || d->events.size() == 0);
                     d = parse_conf(xml);
                 }
                 else if(xml.name() == EVENT_TAG)
                 {
-                    d.events += parse_events(xml);
+                    assert(d); //conference data comes before event data in pentabarf xml
+                    d->events += parse_events(xml);
                 }
             }
         }
@@ -51,13 +54,14 @@ conference_data pentabarf_parser::parse(QFile &file)
         qDebug() << "Failed opening conf data file:" << file.errorString();
         throw std::runtime_error("Could not read conference data.");
     }
+
+    return nullptr;
 }
 
 //methods for parsing the general conference data
-conference_data pentabarf_parser::parse_conf(QXmlStreamReader &xml)
+std::unique_ptr<conference_data> pentabarf_parser::parse_conf(QXmlStreamReader &xml)
 {
-    conference_data d;
-
+    std::unique_ptr<conference_data> d(new conference_data());
     for(auto token = xml.readNext();
         !xml.atEnd() && !xml.hasError();
         token = xml.readNext())
@@ -70,31 +74,32 @@ conference_data pentabarf_parser::parse_conf(QXmlStreamReader &xml)
 
         if(token == QXmlStreamReader::StartElement)
         {
+            assert(d);
             if(xml.name() == TITLE_TAG)
             {
-                d.title = parse_conf_title(xml);
+                d->title = parse_conf_title(xml);
             }
             else if(xml.name() == SUBTITLE_TAG)
             {
-                d.subtitle = parse_conf_subtitle(xml);
+                d->subtitle = parse_conf_subtitle(xml);
             }
             else if(xml.name() == VENUE_TAG)
             {
-                d.venue = parse_conf_venue(xml);
+                d->venue = parse_conf_venue(xml);
             }
             else if(xml.name() == CITY_TAG)
             {
-                d.city = parse_conf_city(xml);
+                d->city = parse_conf_city(xml);
             }
         }
         else if(token == QXmlStreamReader::EndElement &&
                 xml.name() == CONF_TAG)
         {
             qDebug() << "Conference data parsed: " <<
-                        "title: " << d.title << ", " <<
-                        "subtitle: " << d.subtitle << ", " <<
-                        "venue: " << d.venue << ", " <<
-                        "city: " << d.city;
+                        "title: " << d->title << ", " <<
+                        "subtitle: " << d->subtitle << ", " <<
+                        "venue: " << d->venue << ", " <<
+                        "city: " << d->city;
             return d;
         }
     }
@@ -103,7 +108,7 @@ conference_data pentabarf_parser::parse_conf(QXmlStreamReader &xml)
     //xml should already be in an error state, which is handled in the
     //main parse() method, so it's safe to return probably faulty data.
     assert(xml.hasError());
-    return d;
+    return nullptr;
 }
 
 QString pentabarf_parser::parse_conf_title(QXmlStreamReader &xml)
