@@ -106,13 +106,29 @@ Page {
             }
         }
 
-        // Tell SilicaFlickable the height of its content.
-        //contentHeight: column.height
-
         VerticalScrollDecorator {}
 
         delegate: ListItem {
+
+            function remove(item_title) {
+                remorseAction("Deleting " + item_title, function() { console.log("would delete item " + index); });
+            }
+            function show_details(item) {
+                console.log("show_details[" + index + "]: " + item.conf_id + " " + item.title);
+                //pageStack.push(Qt.resolvedUrl("event_details_page.qml"), { conf_event: eventModel.get_event(item.id) })
+            }
+
             contentHeight: column.height
+            menu: ContextMenu {
+                MenuItem {
+                    text: "Delete"
+                    onClicked: remove(model.title)
+                }
+                MenuItem {
+                    text: "Show events"
+                    onClicked: show_details(confOverviewList.model.get(model.conf_id))
+                }
+            }
 
             Column {
                 id: column
