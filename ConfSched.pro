@@ -26,7 +26,8 @@ OTHER_FILES += qml/ConfSched.qml \
     rpm/ConfSched.yaml \
     ConfSched.desktop \
     qml/pages/ConferenceOverviewPage.qml \
-    qml/pages/AddConferencePage.qml
+    qml/pages/AddConferencePage.qml \
+    qml/pages/ConferenceDetailPage.qml
 
 HEADERS += \
     src/conf_scheduler.h \
