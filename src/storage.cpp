@@ -19,6 +19,9 @@ using cfs::detail::storage;
 
 class storage::impl
 {
+    //enum in the same order as the database fields
+    enum { ID, TITLE, VENUE, CITY, CODE, URL, SUBTITLE };
+
 public:
     impl(const QString &storage_identifier)
     {
@@ -110,7 +113,6 @@ public:
         query.prepare("SELECT * FROM confs");
         if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
 
-        enum { ID, TITLE, VENUE, CITY, CODE, URL, SUBTITLE };
         std::vector<conference_data> results;
         while(query.next())
         {
@@ -127,6 +129,38 @@ public:
         }
 
         return results;
+    }
+
+    conference_data get_conference(const int id)
+    {
+        assert(db_.open());
+
+        QSqlQuery query(db_);
+        query.prepare("SELECT * FROM confs WHERE Id = :id");
+        query.bindValue(":id", id);
+
+        if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
+        assert(query.numRowsAffected() <= 1);
+
+        if(query.next())
+        {
+            conference_data d;
+            d.id = query.value(ID).toInt();
+            d.title = query.value(TITLE).toString();
+            d.subtitle = query.value(SUBTITLE).toString();
+            d.venue = query.value(VENUE).toString();
+            d.city = query.value(CITY).toString();
+            d.code = query.value(CODE).toString();
+            d.remote_data = query.value(URL).toString();
+
+            return d;
+        }
+        else
+        {
+            std::ostringstream msg;
+            msg << "Conference with id=" << id << " not found in database.";
+            throw std::runtime_error(msg.str().c_str());
+        }
     }
 
 private:
@@ -164,6 +198,12 @@ std::vector<conference_data> storage::get_conferences() const
 {
     assert(impl_);
     return impl_->get_conferences();
+}
+
+cfs::detail::conference_data storage::get_conference(const int id) const
+{
+    assert(impl_);
+    return impl_->get_conference(id);
 }
 
 int storage::add_or_update_conference(const conference_data &d)

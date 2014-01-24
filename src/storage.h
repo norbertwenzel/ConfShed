@@ -21,6 +21,7 @@ public:
 
     int get_num_conferences() const;
     std::vector<conference_data> get_conferences() const;
+    conference_data get_conference(const int id) const;
 
     int add_or_update_conference(const conference_data &d);
     void delete_conference(int conf_id);
