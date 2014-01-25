@@ -129,11 +129,11 @@ void conf_scheduler::removeConference(cfs::conference *conf)
 {
     if(!conf)
     {
-        qDebug() << __FUNCTION__ << "(nullptr)";
+        qDebug() << "(nullptr)";
         return;
     }
 
-    qDebug() << __FUNCTION__ << conf->conf_id() << conf->title();
+    qDebug() << conf->conf_id() << conf->title();
 
     try
     {
@@ -158,6 +158,27 @@ void conf_scheduler::removeConference(cfs::conference *conf)
     }
 
     emit conferenceListChanged(get_all_conferences());
+}
+
+void conf_scheduler::updateConference(cfs::conference *conf)
+{
+    if(!conf)
+    {
+        qDebug() << "(nullptr)";
+        return;
+    }
+
+    qDebug() << conf->conf_id() << conf->title();
+
+    try
+    {
+        do_update_conference(conf, true, true);
+    }
+    catch(const std::exception &e)
+    {
+        emit error(QString::fromLocal8Bit(e.what()));
+        return;
+    }
 }
 
 void conf_scheduler::updateAllConferences()
@@ -186,8 +207,10 @@ void conf_scheduler::updateAllConferences()
             assert(data);
 
             //update the conference in the database
+            data->id = d.id;
             data->code = d.code;
             data->remote_data = d.remote_data;
+            qDebug() << "Updating conference" << d.id << d.title << "check:" << data->id << data->title;
             data->id = storage_->add_or_update_conference(*data);
 
             all_confs.push_back(new conference(*data, const_cast<conf_scheduler*>(this)));
@@ -245,6 +268,44 @@ std::unique_ptr<cfs::detail::conference_data> conf_scheduler::parse_conference_c
     {
         throw std::runtime_error("Failed to read conference data.");
     }
+}
+
+void conf_scheduler::do_update_conference(cfs::conference *conf,
+                                          bool update_remote_file,
+                                          bool update_all_events)
+{
+    assert(storage_);
+    const auto &db_data = storage_->get_conference(conf->conf_id());
+
+    //compute a valid data file location
+    const auto &local_data_file = get_data_file_location(db_data.code, ".xml");
+
+    //update the remote file if necessary
+    if(update_remote_file)
+    {
+        download_conf_data(db_data.remote_data, local_data_file);
+    }
+
+    //parse the necessary conference data
+    decltype(parse_conference_complete(local_data_file)) data;
+    if(update_all_events)
+    {
+        data = parse_conference_complete(local_data_file);
+    }
+    else
+    {
+        data = parse_conference_header(local_data_file);
+    }
+    assert(data);
+
+    //update the conference in the database
+    data->id = db_data.id;
+    data->code = db_data.code;
+    data->remote_data = db_data.remote_data;
+    data->id = storage_->add_or_update_conference(*data);
+
+    //update the conference
+    conf->update_data(*data);
 }
 
 QDir conf_scheduler::get_existing_data_dir()

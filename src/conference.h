@@ -6,11 +6,15 @@
 #include <QUrl>
 #include <QSharedPointer>
 #include <QDir>
+#include <QList>
 
 #include "conference_data.h"
 
 namespace cfs
 {
+
+class conf_scheduler;
+class event;
 
 class conference : public QObject
 {
@@ -27,7 +31,7 @@ class conference : public QObject
 public:
     explicit conference(QObject *parent = nullptr);
     explicit conference(const detail::conference_data &cd,
-                        QObject *parent = nullptr);
+                        conf_scheduler *parent);
 #ifndef NDEBUG
     ~conference();
 #endif
@@ -42,9 +46,16 @@ public:
 
     static QString compute_code(const QUrl &remote_data_url);
 
+    void update_data(const detail::conference_data &cd);
+
 signals:
+    void eventsUpdated() const;
 
 public slots:
+    void update();
+
+private:
+    void create_events(const QList<detail::conference_data::event_data> &ed);
 
 private:
     static const int INVALID_CONFERENCE_ID = 0;
@@ -56,6 +67,8 @@ private:
     QString city_;
     QString code_;
     QUrl remote_file_;
+
+    QList<cfs::event*> events_;
 };
 
 } //namespace cfs
