@@ -36,7 +36,7 @@ struct conference_data
         QString abstract;
         QString description;
         QString room;
-        QList<QString> speaker;
+        QList<QString> persons;
         QDateTime starttime;
         QDateTime endtime;
     };
