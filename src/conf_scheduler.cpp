@@ -56,10 +56,12 @@ cfs::conference_list_model* conf_scheduler::get_all_conferences() const
         qDebug() << "Trying to load" << all_data.size() << "conferences.";
 
         all_confs.reserve(all_data.size());
-        std::for_each(std::begin(all_data), std::end(all_data),
+        const auto parent_ptr = const_cast<conf_scheduler*>(this);
+        std::transform(std::begin(all_data), std::end(all_data),
+                       std::back_inserter(all_confs),
         [&](decltype(*std::begin(all_data)) &d)
         {
-            all_confs.push_back(new conference(d, const_cast<conf_scheduler*>(this)));
+            return new conference(d, parent_ptr);
         });
 
         assert(all_confs.size() == get_num_conferences());
