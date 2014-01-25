@@ -185,35 +185,23 @@ void conf_scheduler::updateAllConferences()
 {
     qDebug() << __FUNCTION__;
 
-    QList<cfs::conference*> all_confs;
+    QList<cfs::conference*> all_confs = findChildren<cfs::conference*>();
+#ifndef NDEBUG
+    std::for_each(std::begin(all_confs), std::end(all_confs),
+    [](decltype(*std::begin(all_confs)) &conf)
+    {
+        assert(conf);
+    });
+#endif
     try
     {
-        assert(storage_);
-        const auto &all_data = storage_->get_conferences();
-        qDebug() << "Trying to update" << all_data.size() << "conferences.";
-
-        all_confs.reserve(all_data.size());
+        qDebug() << "Trying to update" << all_confs.size() << "conferences.";
 
         //TODO: this should maybe run concurrenty
-        std::for_each(std::begin(all_data), std::end(all_data),
-        [&](decltype(*std::begin(all_data)) &d)
+        std::for_each(std::begin(all_confs), std::end(all_confs),
+        [&](decltype(*std::begin(all_confs)) &conf)
         {
-            //compute a valid data file location
-            const auto &local_data_file = get_data_file_location(d.code, ".xml");
-
-            download_conf_data(d.remote_data, local_data_file);
-            //TODO parse the conference data *only*
-            const auto &data = parse_conference_header(local_data_file);
-            assert(data);
-
-            //update the conference in the database
-            data->id = d.id;
-            data->code = d.code;
-            data->remote_data = d.remote_data;
-            qDebug() << "Updating conference" << d.id << d.title << "check:" << data->id << data->title;
-            data->id = storage_->add_or_update_conference(*data);
-
-            all_confs.push_back(new conference(*data, const_cast<conf_scheduler*>(this)));
+            do_update_conference(conf, true, false);
         });
 
         assert(all_confs.size() == get_num_conferences());
@@ -225,6 +213,7 @@ void conf_scheduler::updateAllConferences()
         return;
     }
 
+    //TODO: possibly update an already existing conference_list_model child instead of creating a new one
     emit conferenceListChanged(new cfs::conference_list_model(all_confs, const_cast<conf_scheduler*>(this)));
 }
 
