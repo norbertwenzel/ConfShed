@@ -22,6 +22,8 @@ class storage::impl
     //enum in the same order as the database fields
     enum { ID, TITLE, VENUE, CITY, CODE, URL, SUBTITLE };
 
+    static const int INVALID_ID = 0;
+
 public:
     impl(const QString &storage_identifier)
     {
@@ -77,16 +79,33 @@ public:
         assert(db_.open());
 
         QSqlQuery query(db_);
-        query.prepare("INSERT OR REPLACE INTO confs (Title, Subtitle, Venue, City, Code, Url) VALUES (:title, :subtitle, :venue, :city, :code, :url)");
+        if(d.id == INVALID_ID)
+        {
+            query.prepare("INSERT OR REPLACE INTO confs (Title, Subtitle, Venue, City, Code, Url) VALUES (:title, :subtitle, :venue, :city, :code, :url)");
+            query.bindValue(":code", d.code);
+            query.bindValue(":url", d.remote_data);
+        }
+        else
+        {
+            query.prepare("UPDATE OR REPLACE confs SET Title = :title, Subtitle = :subtitle, Venue = :venue, City = :city WHERE Id = :id");
+            query.bindValue(":id", d.id);
+        }
         query.bindValue(":title", d.title);
         query.bindValue(":subtitle", d.subtitle);
         query.bindValue(":venue", d.venue);
         query.bindValue(":city", d.city);
-        query.bindValue(":code", d.code);
-        query.bindValue(":url", d.remote_data);
 
         if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
-        return query.lastInsertId().toInt();
+
+        if(d.id == INVALID_ID)
+        {
+            assert(query.lastInsertId().toInt() != INVALID_ID);
+            return query.lastInsertId().toInt();
+        }
+        else
+        {
+            return d.id;
+        }
     }
 
     void delete_conference(int conf_id)
