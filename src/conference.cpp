@@ -34,10 +34,10 @@ conference::conference(const detail::conference_data &cd,
                        cfs::conf_scheduler *parent) :
     QObject(parent),
     id_(cd.id),
-    title_(cd.title),
-    subtitle_(cd.subtitle),
-    venue_(cd.venue),
-    city_(cd.city),
+    title_(cd.title.trimmed()),
+    subtitle_(cd.subtitle.trimmed()),
+    venue_(cd.venue.trimmed()),
+    city_(cd.city.trimmed()),
     code_(cd.code),
     remote_file_(cd.remote_data)
 {
