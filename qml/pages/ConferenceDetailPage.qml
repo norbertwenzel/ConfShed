@@ -7,22 +7,29 @@ Page {
 
     property Conference conf: null
 
-    SilicaListView {
+    function show_event_list() {
+        console.log("show_event_list()");
+    }
+
+    Component.onCompleted: {
+        if(conf != null) {
+            conf.eventsUpdated.connect(show_event_list);
+            conf.update();
+        }
+    }
+
+    SilicaFlickable {
         id: confEventList
+        contentHeight: confData.height
 
         anchors.fill: parent
-        //model: ConferenceList{}
-
-        header: PageHeader {
-            title: conf != null ? conf.title : ""
-        }
 
         PullDownMenu {
 
         }
 
         ViewPlaceholder {
-            enabled: confEventList.count == 0
+            enabled: confEventList.count === 0
             text: "No conferences configured"
             hintText: "Pull down to add a conference"
         }
@@ -38,7 +45,15 @@ Page {
 
         Column {
             id: confData
+            width: parent.width
 
+            PageHeader {
+                //title: conf != null ? conf.title : "Conference"
+                title: "Conference"
+            }
+            SectionHeader {
+                text: conf != null ? conf.title : ""
+            }
             Label {
                 text: conf != null ? conf.title : ""
             }
@@ -50,17 +65,6 @@ Page {
             }
             Label {
                 text: conf != null ? conf.city : ""
-            }
-        }
-
-        delegate: ListItem {
-
-            contentHeight: column.height
-            menu: ContextMenu {
-            }
-
-            Column {
-                id: column
             }
         }
     }
