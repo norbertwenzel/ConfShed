@@ -1,6 +1,8 @@
 #ifndef CFS_CONFERENCE_H
 #define CFS_CONFERENCE_H
 
+#include <memory>
+
 #include <QObject>
 #include <QString>
 #include <QUrl>
@@ -33,11 +35,9 @@ class conference : public QObject
 
 public:
     explicit conference(QObject *parent = nullptr);
-    explicit conference(const detail::conference_data &cd,
-                        conf_scheduler *parent);
-#ifndef NDEBUG
+    conference(const detail::conference_data &cd,
+               conf_scheduler *parent);
     ~conference();
-#endif
 
     int conf_id() const { return id_; }
     QString title() const { return title_; }
@@ -58,6 +58,10 @@ signals:
 public slots:
     void update();
 
+    //TODO use http://qt-project.org/doc/qt-5.0/qtcore/qsortfilterproxymodel.html instead
+    void sort_events();
+    void filter_events();
+
 private:
     void create_events(const QList<detail::conference_data::event_data> &ed);
 
@@ -73,6 +77,10 @@ private:
     QUrl remote_file_;
 
     QList<cfs::event*> events_;
+
+private:
+    struct cache;
+    std::unique_ptr<cache> cache_;
 };
 
 } //namespace cfs

@@ -3,7 +3,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <cassert>
-#include <memory>
+#include <vector>
 #include <algorithm>
 
 #include <QDebug>
@@ -16,6 +16,13 @@
 #include "conf_scheduler.h"
 
 using cfs::conference;
+
+struct conference::cache
+{
+    QList<cfs::event*> current_view;
+
+    std::vector<cfs::event*> events_by_track;
+};
 
 conference::conference(QObject *parent) :
     QObject(parent),
@@ -38,16 +45,24 @@ conference::conference(const detail::conference_data &cd,
     create_events(cd.events);
 }
 
-#ifndef NDEBUG
 conference::~conference()
 {
+    //empty dtor because of forward declared cache
     qDebug() << "conf: " << id_;
 }
-#endif
 
 QQmlListProperty<cfs::event> conference::events()
 {
-    return QQmlListProperty<cfs::event>(this, events_);
+    qDebug() << std::boolalpha << static_cast<bool>(cache_);
+
+    if(cache_)
+    {
+        return QQmlListProperty<cfs::event>(this, cache_->current_view);
+    }
+    else
+    {
+        return QQmlListProperty<cfs::event>(this, events_);
+    }
 }
 
 QString conference::compute_code(const QUrl &remote_data_url)
@@ -89,6 +104,45 @@ void conference::update()
     const auto parent_ptr = qobject_cast<cfs::conf_scheduler*>(parent());
     assert(parent_ptr);
     if(parent_ptr) parent_ptr->updateConference(this);
+}
+
+void conference::sort_events()
+{
+    qDebug();
+
+    if(!cache_) cache_.reset(new cache());
+
+    auto &vec = cache_->events_by_track;
+    vec.reserve(events_.size());
+    std::copy(std::begin(events_), std::end(events_),
+              std::back_inserter(vec));
+
+    std::sort(std::begin(vec), std::end(vec),
+    [](cfs::event *e1, cfs::event *e2) -> bool
+    {
+        if(e1->track() == e2->track())
+        {
+            return e1->starttime() < e2->starttime();
+        }
+        else
+        {
+            return e1->track() < e2->track();
+        }
+    });
+
+    //copy the data back
+    auto &cur = cache_->current_view;
+    cur.clear();
+    cur.reserve(vec.size());
+    std::copy(std::begin(vec), std::end(vec),
+              std::back_inserter(cur));
+
+    eventsChanged();
+}
+
+void conference::filter_events()
+{
+
 }
 
 void conference::create_events(const QList<cfs::detail::conference_data::event_data> &ed)
