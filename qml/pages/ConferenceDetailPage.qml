@@ -9,6 +9,9 @@ Page {
 
     function show_event_list() {
         console.log("show_event_list()");
+        if(conf != null) {
+            confDetailView.model = conf.events;
+        }
     }
 
     Component.onCompleted: {
@@ -18,20 +21,14 @@ Page {
         }
     }
 
-    SilicaFlickable {
-        id: confEventList
-        contentHeight: confData.height
+    SilicaListView {
+        id: confDetailView
+        //contentHeight: confData.height
 
         anchors.fill: parent
 
         PullDownMenu {
 
-        }
-
-        ViewPlaceholder {
-            enabled: confEventList.count === 0
-            text: "No conferences configured"
-            hintText: "Pull down to add a conference"
         }
 
         Connections {
@@ -41,18 +38,19 @@ Page {
             }
         }
 
+        ViewPlaceholder {
+            enabled: confDetailView.count === 0
+            text: "No events available"
+            //hintText: "Pull down to add a conference"
+        }
+
         VerticalScrollDecorator {}
 
-        Column {
-            id: confData
+        header: Column {
             width: parent.width
 
             PageHeader {
-                //title: conf != null ? conf.title : "Conference"
-                title: "Conference"
-            }
-            SectionHeader {
-                text: conf != null ? conf.title : ""
+                title: conf != null ? conf.title : "Conference"
             }
             Label {
                 text: conf != null ? conf.title : ""
@@ -67,5 +65,27 @@ Page {
                 text: conf != null ? conf.city : ""
             }
         }
+
+        section {
+            property: 'track'
+            delegate: SectionHeader {
+                text: section
+            }
+        }
+
+        delegate: //BackgroundItem {
+            //width: confDetailView.width
+            //Column {
+                Label {
+                    text: model.title
+                    wrapMode: TextEdit.Wrap
+                    width: confDetailView.width
+                }
+           /*     Label {
+                    text: model.subtitle.length !== 0 ? model.subtitle : ""
+                }
+
+            }*/
+        //}
     }
 }
