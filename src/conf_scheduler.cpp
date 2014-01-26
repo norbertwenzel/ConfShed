@@ -172,7 +172,8 @@ void conf_scheduler::updateConference(cfs::conference *conf)
 
     try
     {
-        do_update_conference(conf, true, true);
+        do_update_conference(conf, false, true);
+        emit conf->eventsUpdated(); //TODO: call signal inside conference and only when necessary
     }
     catch(const std::exception &e)
     {
