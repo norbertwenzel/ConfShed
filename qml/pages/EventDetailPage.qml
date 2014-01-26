@@ -14,7 +14,7 @@ Page {
 
     SilicaFlickable {
         id: eventDetailView
-        //contentHeight: confData.height
+        contentHeight: eventDetailData.height
 
         anchors.fill: parent
 
@@ -31,6 +31,7 @@ Page {
         VerticalScrollDecorator {}
 
         Column {
+            id: eventDetailData
             width: parent.width
 
             PageHeader {
@@ -38,24 +39,45 @@ Page {
             }
             Label {
                 text: conf_event != null ? conf_event.title : ""
+                wrapMode: TextEdit.Wrap
+                width: parent.width
+                font.pixelSize: Theme.fontSizeMedium
             }
             Label {
                 text: conf_event != null ? conf_event.subtitle : ""
+                wrapMode: TextEdit.Wrap
+                width: parent.width
+                font.pixelSize: Theme.fontSizeSmall
             }
             Label {
                 text: conf_event != null ? conf_event.room : ""
+                wrapMode: TextEdit.Wrap
+                width: parent.width
+                font.pixelSize: Theme.fontSizeSmall
             }
             Label {
-                text: conf_event != null ? conf_event.persons : ""
+                text: conf_event != null ? conf_event.persons.toString() : ""
+                wrapMode: TextEdit.Wrap
+                width: parent.width
+                font.pixelSize: Theme.fontSizeSmall
             }
             Label {
-                text: conf_event != null ? conf_event.starttime + " - " + conf_event.endtime : ""
+                text: conf_event != null ? Qt.formatDateTime(conf_event.starttime, "dddd yyyy-MM-dd HH:mm") + " - " + Qt.formatDateTime(conf_event.endtime, "HH:mm") : ""
+                wrapMode: TextEdit.Wrap
+                width: parent.width
+                font.pixelSize: Theme.fontSizeSmall
             }
             Label {
                 text: conf_event != null ? conf_event.abstract : ""
+                wrapMode: TextEdit.Wrap
+                width: parent.width
+                font.pixelSize: Theme.fontSizeSmall
             }
             Label {
                 text: conf_event != null ? conf_event.description : ""
+                wrapMode: TextEdit.Wrap
+                width: parent.width
+                font.pixelSize: Theme.fontSizeSmall
             }
         }
     }
