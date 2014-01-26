@@ -28,7 +28,11 @@ Page {
         anchors.fill: parent
 
         PullDownMenu {
-
+            MenuItem {
+                text: "Sort events"
+                onClicked: conf.sort_events()
+                enabled: conf !== null
+            }
         }
 
         Connections {
