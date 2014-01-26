@@ -19,7 +19,8 @@ SOURCES += src/ConfSched.cpp \
     src/pentabarf_parser.cpp \
     src/storage.cpp \
     src/conference_list.cpp \
-    src/event.cpp
+    src/event.cpp \
+    src/event_list_model.cpp
 
 OTHER_FILES += qml/ConfSched.qml \
     qml/cover/CoverPage.qml \
@@ -40,7 +41,8 @@ HEADERS += \
     src/pentabarf_parser.h \
     src/storage.h \
     src/conference_list.h \
-    src/event.h
+    src/event.h \
+    src/event_list_model.h
 
 QT += network
 QT += sql

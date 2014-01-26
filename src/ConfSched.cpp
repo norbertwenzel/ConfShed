@@ -44,6 +44,7 @@
 #include "src/conference.h"
 #include "src/conference_list.h"
 #include "src/event.h"
+#include "src/event_list_model.h"
 
 int main(int argc, char *argv[])
 {
@@ -53,6 +54,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<cfs::conference>("ConfSched", 0, 1, "Conference");
     qmlRegisterType<cfs::conference_list_model>("ConfSched", 0, 1, "ConferenceList");
     qmlRegisterType<cfs::event>("ConfSched", 0, 1, "ConferenceEvent");
+    qmlRegisterType<cfs::event_list_model>("ConfSched", 0, 1, "ConferenceEventList");
 
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 

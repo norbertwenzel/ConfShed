@@ -13,6 +13,7 @@
 
 #include "conference_data.h"
 #include "event.h"
+#include "event_list_model.h"
 
 namespace cfs
 {
@@ -31,7 +32,8 @@ class conference : public QObject
     Q_PROPERTY(QString code READ code CONSTANT)
     Q_PROPERTY(QUrl remote_file READ remote_file CONSTANT)
 
-    Q_PROPERTY(QQmlListProperty<cfs::event> events READ events NOTIFY eventsChanged)
+    //Q_PROPERTY(QQmlListProperty<cfs::event> events READ events NOTIFY eventsChanged)
+    Q_PROPERTY(cfs::event_list_model* events READ events NOTIFY eventsChanged)
 
 public:
     explicit conference(QObject *parent = nullptr);
@@ -46,7 +48,8 @@ public:
     QString city() const { return city_; }
     QString code() const { return code_; }
     QUrl remote_file() const { return remote_file_; }
-    QQmlListProperty<cfs::event> events();
+    //QQmlListProperty<cfs::event> events();
+    cfs::event_list_model* events() const;
 
     static QString compute_code(const QUrl &remote_data_url);
 

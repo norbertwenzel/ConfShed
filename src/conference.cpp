@@ -14,14 +14,16 @@
 #include "pentabarf_parser.h"
 #include "event.h"
 #include "conf_scheduler.h"
+#include "event_list_model.h"
 
 using cfs::conference;
 
 struct conference::cache
 {
-    QList<cfs::event*> current_view;
+    cfs::event_list_model *current_view;
 
-    std::vector<cfs::event*> events_by_track;
+    cfs::event_list_model *events_unsorted;
+    cfs::event_list_model *events_by_track;
 };
 
 conference::conference(QObject *parent) :
@@ -51,18 +53,11 @@ conference::~conference()
     qDebug() << "conf: " << id_;
 }
 
-QQmlListProperty<cfs::event> conference::events()
+cfs::event_list_model *conference::events() const
 {
     qDebug() << "cache = " << static_cast<bool>(cache_);
-
-    if(cache_)
-    {
-        return QQmlListProperty<cfs::event>(this, cache_->current_view);
-    }
-    else
-    {
-        return QQmlListProperty<cfs::event>(this, events_);
-    }
+    assert(cache_);
+    return cache_ ? cache_->current_view : nullptr;
 }
 
 QString conference::compute_code(const QUrl &remote_data_url)
@@ -108,11 +103,10 @@ void conference::update()
 
 void conference::sort_events()
 {
-    qDebug();
+    qDebug() << "cache =" << static_cast<bool>(cache_);
+    assert(cache_);
 
-    if(!cache_) cache_.reset(new cache());
-
-    auto &vec = cache_->events_by_track;
+    std::vector<cfs::event*> vec;
     vec.reserve(events_.size());
     std::copy(std::begin(events_), std::end(events_),
               std::back_inserter(vec));
@@ -130,12 +124,9 @@ void conference::sort_events()
         }
     });
 
-    //copy the data back
-    auto &cur = cache_->current_view;
-    cur.clear();
-    cur.reserve(vec.size());
-    std::copy(std::begin(vec), std::end(vec),
-              std::back_inserter(cur));
+    //copy the data into the view
+    cache_->events_by_track = new event_list_model(std::move(vec), this);
+    cache_->current_view = cache_->events_by_track;
 
     eventsChanged();
 }
@@ -155,4 +146,15 @@ void conference::create_events(const QList<cfs::detail::conference_data::event_d
     });
 
     qDebug() << events_.size() << "events created.";
+
+    if(!cache_) cache_.reset(new cache());
+
+    //copy the data into the view
+    std::vector<cfs::event*> cur;
+    cur.reserve(events_.size());
+    std::copy(std::begin(events_), std::end(events_),
+              std::back_inserter(cur));
+
+    cache_->events_unsorted = new event_list_model(std::move(cur), this);
+    cache_->current_view = cache_->events_unsorted;
 }
