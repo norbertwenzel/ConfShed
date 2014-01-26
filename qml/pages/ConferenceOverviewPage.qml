@@ -90,12 +90,12 @@ Page {
             contentHeight: column.height
             menu: ContextMenu {
                 MenuItem {
-                    text: "Delete"
-                    onClicked: remove(confOverviewList.model.get(model.conf_id))
-                }
-                MenuItem {
                     text: "Show events"
                     onClicked: show_details(confOverviewList.model.get(model.conf_id))
+                }
+                MenuItem {
+                    text: "Delete"
+                    onClicked: remove(confOverviewList.model.get(model.conf_id))
                 }
             }
 
