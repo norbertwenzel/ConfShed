@@ -31,8 +31,8 @@ class event : public QObject
 
 public:
     explicit event(QObject *parent = nullptr);
-    explicit event(const detail::conference_data::event_data &data,
-                   cfs::conference *parent);
+    event(const detail::conference_data::event_data &data,
+          cfs::conference *parent);
 
     int event_id() const { return id_; }
     QString title() const { return title_; }
