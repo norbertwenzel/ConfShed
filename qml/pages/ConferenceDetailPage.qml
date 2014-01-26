@@ -77,13 +77,16 @@ Page {
             }
         }
 
-        delegate: //BackgroundItem {
-            //width: confDetailView.width
+        delegate: ListItem {
+            width: confDetailView.width
+            contentHeight: confTitleLable.height
+
             //Column {
                 Label {
+                    id: confTitleLable
                     text: model.title
                     wrapMode: TextEdit.Wrap
-                    width: confDetailView.width
+                    width: parent.width
                     font.pixelSize: Theme.fontSizeSmall
                 }
            /*     Label {
@@ -91,6 +94,15 @@ Page {
                 }
 
             }*/
-        //}
+           menu: ContextMenu {
+               MenuItem {
+                   text: "Show details"
+                   onClicked: {
+                       console.log(index + ": " + model.title)
+                       pageStack.push(Qt.resolvedUrl("EventDetailPage.qml"), { conf_event: confDetailView.model.get(model.event_id) });
+                   }
+               }
+           }
+        }
     }
 }
