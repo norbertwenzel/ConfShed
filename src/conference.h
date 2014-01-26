@@ -7,14 +7,15 @@
 #include <QSharedPointer>
 #include <QDir>
 #include <QList>
+#include <QQmlListProperty>
 
 #include "conference_data.h"
+#include "event.h"
 
 namespace cfs
 {
 
 class conf_scheduler;
-class event;
 
 class conference : public QObject
 {
@@ -27,6 +28,8 @@ class conference : public QObject
     Q_PROPERTY(QString city READ city CONSTANT)
     Q_PROPERTY(QString code READ code CONSTANT)
     Q_PROPERTY(QUrl remote_file READ remote_file CONSTANT)
+
+    Q_PROPERTY(QQmlListProperty<cfs::event> events READ events CONSTANT)
 
 public:
     explicit conference(QObject *parent = nullptr);
@@ -43,6 +46,7 @@ public:
     QString city() const { return city_; }
     QString code() const { return code_; }
     QUrl remote_file() const { return remote_file_; }
+    QQmlListProperty<cfs::event> events();
 
     static QString compute_code(const QUrl &remote_data_url);
 

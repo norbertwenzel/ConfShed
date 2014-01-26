@@ -45,6 +45,11 @@ conference::~conference()
 }
 #endif
 
+QQmlListProperty<cfs::event> conference::events()
+{
+    return QQmlListProperty<cfs::event>(this, events_);
+}
+
 QString conference::compute_code(const QUrl &remote_data_url)
 {
     QCryptographicHash hasher(QCryptographicHash::Md5);
