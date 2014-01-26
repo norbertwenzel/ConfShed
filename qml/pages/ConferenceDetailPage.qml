@@ -80,6 +80,7 @@ Page {
                     text: model.title
                     wrapMode: TextEdit.Wrap
                     width: confDetailView.width
+                    font.pixelSize: Theme.fontSizeSmall
                 }
            /*     Label {
                     text: model.subtitle.length !== 0 ? model.subtitle : ""
