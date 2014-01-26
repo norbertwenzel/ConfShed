@@ -53,7 +53,7 @@ conference::~conference()
 
 QQmlListProperty<cfs::event> conference::events()
 {
-    qDebug() << std::boolalpha << static_cast<bool>(cache_);
+    qDebug() << "cache = " << static_cast<bool>(cache_);
 
     if(cache_)
     {
