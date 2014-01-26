@@ -29,7 +29,7 @@ class conference : public QObject
     Q_PROPERTY(QString code READ code CONSTANT)
     Q_PROPERTY(QUrl remote_file READ remote_file CONSTANT)
 
-    Q_PROPERTY(QQmlListProperty<cfs::event> events READ events CONSTANT)
+    Q_PROPERTY(QQmlListProperty<cfs::event> events READ events NOTIFY eventsChanged)
 
 public:
     explicit conference(QObject *parent = nullptr);
@@ -53,7 +53,7 @@ public:
     void update_data(const detail::conference_data &cd);
 
 signals:
-    void eventsUpdated() const;
+    void eventsChanged() const;
 
 public slots:
     void update();

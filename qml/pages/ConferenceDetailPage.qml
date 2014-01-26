@@ -16,7 +16,7 @@ Page {
 
     Component.onCompleted: {
         if(conf != null) {
-            conf.eventsUpdated.connect(show_event_list);
+            conf.eventsChanged.connect(show_event_list);
             conf.update();
         }
     }
