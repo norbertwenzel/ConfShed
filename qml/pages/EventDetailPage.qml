@@ -48,6 +48,7 @@ Page {
                 wrapMode: TextEdit.Wrap
                 width: parent.width
                 font.pixelSize: Theme.fontSizeSmall
+                visible: conf_event != null && conf_event.subtitle.length > 0
             }
             Label {
                 text: conf_event != null ? conf_event.room : ""
