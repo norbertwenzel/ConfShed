@@ -275,6 +275,7 @@ pentabarf_parser::event_data pentabarf_parser::parse_single_event(QXmlStreamRead
         assert(event.starttime.isValid());
 
         //compute the endtime from start and duration
+        assert(event_duration.isValid());
         event.endtime = event.starttime.addSecs(event_duration.hour() * 3600 + event_duration.minute() * 60);
 
         assert(event.endtime.isValid());
