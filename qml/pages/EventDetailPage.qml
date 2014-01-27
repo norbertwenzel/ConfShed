@@ -67,17 +67,29 @@ Page {
                 width: parent.width
                 font.pixelSize: Theme.fontSizeSmall
             }
+            SectionHeader {
+                text: "Abstract"
+                visible: lbl_abstract.visible
+            }
             Label {
+                id: lbl_abstract
                 text: conf_event != null ? conf_event.abstract : ""
                 wrapMode: TextEdit.Wrap
                 width: parent.width
                 font.pixelSize: Theme.fontSizeSmall
+                visible: conf_event != null && conf_event.abstract.length > 0
+            }
+            SectionHeader {
+                text: "Description"
+                visible: lbl_description.visible
             }
             Label {
+                id: lbl_description
                 text: conf_event != null ? conf_event.description : ""
                 wrapMode: TextEdit.Wrap
                 width: parent.width
                 font.pixelSize: Theme.fontSizeSmall
+                visible: conf_event != null && conf_event.description.length > 0
             }
         }
     }
