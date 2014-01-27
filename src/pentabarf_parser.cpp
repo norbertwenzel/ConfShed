@@ -231,6 +231,7 @@ pentabarf_parser::event_data pentabarf_parser::parse_single_event(QXmlStreamRead
         assert(xml.attributes().hasAttribute(ID_ATTRIB));
         event.id = xml.attributes().value(ID_ATTRIB).toInt();
 
+        QTime event_duration;
         for(auto token = xml.readNext();
             !xml.atEnd() && !xml.hasError() && !(token == QXmlStreamReader::EndElement && xml.name() == EVENT_TAG);
             token = xml.readNext())
@@ -258,9 +259,8 @@ pentabarf_parser::event_data pentabarf_parser::parse_single_event(QXmlStreamRead
                 }
                 else if(xml.name() == DURATION_TAG)
                 {
-                    const auto time = QTime::fromString(xml.readElementText(), "HH:mm");
-                    assert(!time.isNull() && time.isValid());
-                    event.endtime = QDateTime(date, time);
+                    event_duration = QTime::fromString(xml.readElementText(), "HH:mm");
+                    assert(!event_duration.isNull() && event_duration.isValid());
                 }
             }
         }
@@ -273,7 +273,12 @@ pentabarf_parser::event_data pentabarf_parser::parse_single_event(QXmlStreamRead
         //assert(event.description.size() > 0); optional value
         assert(event.room.size() > 0);
         assert(event.starttime.isValid());
+
+        //compute the endtime from start and duration
+        event.endtime = event.starttime.addSecs(event_duration.hour() * 3600 + event_duration.minute() * 60);
+
         assert(event.endtime.isValid());
+        assert(event.starttime < event.endtime);
 
         return event;
     }
