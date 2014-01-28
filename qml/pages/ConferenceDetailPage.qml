@@ -102,6 +102,12 @@ Page {
             }*/
            menu: ContextMenu {
                MenuItem {
+                   text: model.favorite ? "Remove favorite" : "Add favorite"
+                   onClicked: {
+                       confDetailView.model.get(model.event_id).favorite = !confDetailView.model.get(model.event_id).favorite;
+                   }
+               }
+               MenuItem {
                    text: "Show details"
                    onClicked: {
                        console.log(index + ": " + model.title)
