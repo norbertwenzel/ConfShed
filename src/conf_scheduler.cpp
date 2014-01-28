@@ -322,7 +322,7 @@ void conf_scheduler::do_update_conference(cfs::conference *conf,
     data->remote_data = db_data.remote_data;
     data->id = storage_->add_or_update_conference(*data);
 
-    //TODO: check the favorite list for the current conference and set the event status appropriately
+    //check the favorite list for the current conference and set the event status appropriately
     if(data->events.size() > 0)
     {
         auto favorites = storage_->get_favorites(data->id);
