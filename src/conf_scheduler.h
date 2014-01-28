@@ -19,6 +19,8 @@ class storage;
 class conference_data;
 } //namespace detail
 
+class event;
+
 class conf_scheduler : public QObject
 {
     Q_OBJECT
@@ -28,6 +30,9 @@ public:
 
     Q_INVOKABLE int get_num_conferences() const;
     Q_INVOKABLE cfs::conference_list_model* get_all_conferences() const;
+
+    void star_event(const cfs::conference &conf, const cfs::event &evnt);
+    void unstar_event(const cfs::conference &conf, const cfs::event &evnt);
 
 signals:
     void conferenceListChanged(cfs::conference_list_model *confs) const;

@@ -84,6 +84,34 @@ cfs::conference_list_model* conf_scheduler::get_all_conferences() const
     return new cfs::conference_list_model(all_confs, const_cast<conf_scheduler*>(this));
 }
 
+void conf_scheduler::star_event(const cfs::conference &conf, const cfs::event &evnt)
+{
+    try
+    {
+        assert(storage_);
+        storage_->add_favorite(conf.conf_id(), evnt.event_id());
+    }
+    catch(const std::exception &e)
+    {
+        emit error(QString::fromLocal8Bit(e.what()));
+        throw;
+    }
+}
+
+void conf_scheduler::unstar_event(const cfs::conference &conf, const cfs::event &evnt)
+{
+    try
+    {
+        assert(storage_);
+        storage_->remove_favorite(conf.conf_id(), evnt.event_id());
+    }
+    catch(const std::exception &e)
+    {
+        emit error(QString::fromLocal8Bit(e.what()));
+        throw;
+    }
+}
+
 void conf_scheduler::addConference(const QUrl &remote_conf_data_url)
 {
     qDebug() << remote_conf_data_url;

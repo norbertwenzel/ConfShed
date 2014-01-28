@@ -28,6 +28,7 @@ class event : public QObject
     Q_PROPERTY(QList<QString> persons READ persons CONSTANT)
     Q_PROPERTY(QDateTime starttime READ starttime CONSTANT)
     Q_PROPERTY(QDateTime endtime READ endtime CONSTANT)
+    Q_PROPERTY(bool favorite READ favorite WRITE favorite NOTIFY favoriteChanged)
 
 public:
     explicit event(QObject *parent = nullptr);
@@ -44,8 +45,11 @@ public:
     QList<QString> persons() const { return persons_; }
     QDateTime starttime() const { return start_; }
     QDateTime endtime() const { return end_; }
+    bool favorite() const { return favorite_; }
+    void favorite(bool status);
 
 signals:
+    void favoriteChanged(bool status) const;
 
 public slots:
 
@@ -60,6 +64,7 @@ private:
     QList<QString> persons_;
     QDateTime start_;
     QDateTime end_;
+    bool favorite_;
 };
 
 } //namespace cfs

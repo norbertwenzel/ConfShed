@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtDebug>
+
 #include "conference.h"
 
 using cfs::event;
@@ -26,4 +28,27 @@ event::event(const cfs::detail::conference_data::event_data &data,
     end_(data.endtime)
 {
     assert(parent != nullptr);
+}
+
+void event::favorite(bool status)
+{
+    if(favorite() == status) return;
+
+    const auto parent_ptr = qobject_cast<cfs::conference*>(parent());
+    assert(parent_ptr);
+    if(parent_ptr)
+    {
+        try
+        {
+            if(status) parent_ptr->star_event(*this);
+            else parent_ptr->unstar_event(*this);
+
+            favorite_ = status;
+            emit favoriteChanged(favorite_);
+        }
+        catch(const std::exception &e)
+        {
+            qDebug() << "Exception:" << e.what();
+        }
+    }
 }

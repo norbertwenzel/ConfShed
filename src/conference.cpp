@@ -94,6 +94,22 @@ void conference::update_data(const cfs::detail::conference_data &cd)
     create_events(cd.events);
 }
 
+void conference::star_event(const cfs::event &e)
+{
+    const auto parent_ptr = qobject_cast<cfs::conf_scheduler*>(parent());
+    assert(parent_ptr);
+    if(parent_ptr) parent_ptr->star_event(*this, e);
+    else throw std::runtime_error("Conference has no valid parent element;");
+}
+
+void conference::unstar_event(const cfs::event &e)
+{
+    const auto parent_ptr = qobject_cast<cfs::conf_scheduler*>(parent());
+    assert(parent_ptr);
+    if(parent_ptr) parent_ptr->unstar_event(*this, e);
+    else throw std::runtime_error("Conference has no valid parent element;");
+}
+
 void conference::update()
 {
     const auto parent_ptr = qobject_cast<cfs::conf_scheduler*>(parent());

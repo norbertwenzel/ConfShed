@@ -31,8 +31,6 @@ class conference : public QObject
     Q_PROPERTY(QString city READ city CONSTANT)
     Q_PROPERTY(QString code READ code CONSTANT)
     Q_PROPERTY(QUrl remote_file READ remote_file CONSTANT)
-
-    //Q_PROPERTY(QQmlListProperty<cfs::event> events READ events NOTIFY eventsChanged)
     Q_PROPERTY(cfs::event_list_model* events READ events NOTIFY eventsChanged)
 
 public:
@@ -48,12 +46,13 @@ public:
     QString city() const { return city_; }
     QString code() const { return code_; }
     QUrl remote_file() const { return remote_file_; }
-    //QQmlListProperty<cfs::event> events();
     cfs::event_list_model* events() const;
 
     static QString compute_code(const QUrl &remote_data_url);
 
     void update_data(const detail::conference_data &cd);
+    void star_event(const cfs::event &e);
+    void unstar_event(const cfs::event &e);
 
 signals:
     void eventsChanged() const;

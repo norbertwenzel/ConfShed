@@ -195,7 +195,7 @@ public:
         assert(query.numRowsAffected() <= 1);
     }
 
-    void delete_favorite(int conf_id, int event_id)
+    void remove_favorite(int conf_id, int event_id)
     {
         assert(db_.open());
 
@@ -277,8 +277,8 @@ void storage::add_favorite(int conf_id, int event_id)
     impl_->add_favorite(conf_id, event_id);
 }
 
-void storage::delete_favorite(int conf_id, int event_id)
+void storage::remove_favorite(int conf_id, int event_id)
 {
     assert(impl_);
-    impl_->delete_favorite(conf_id, event_id);
+    impl_->remove_favorite(conf_id, event_id);
 }
