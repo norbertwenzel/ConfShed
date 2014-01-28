@@ -187,8 +187,11 @@ private:
     {
         assert(db_.open());
 
-        auto res = db_.exec("CREATE TABLE IF NOT EXISTS confs(Id INTEGER PRIMARY KEY, Title TEXT, Venue TEXT, City TEXT, Code TEXT UNIQUE, Url TEXT, Subtitle TEXT)");
+        auto res = db_.exec("CREATE TABLE IF NOT EXISTS confs(Id INTEGER PRIMARY KEY, Title TEXT NOT NULL, Venue TEXT, City TEXT, Code TEXT UNIQUE NOT NULL, Url TEXT NOT NULL, Subtitle TEXT)");
         //TODO: throw exception, but check where that exception is caught
+        assert(res.lastError().type() == QSqlError::NoError);
+
+        res = db_.exec("CREATE TABLE IF NOT EXISTS favs(Id INTEGER PRIMARY KEY, Conference INTEGER NOT NULL, Event INTEGER NOT NULL, FOREIGN KEY(Conference) REFERENCES confs(Id))");
         assert(res.lastError().type() == QSqlError::NoError);
     }
 
