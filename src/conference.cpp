@@ -41,7 +41,9 @@ conference::conference(const detail::conference_data &cd,
     venue_(cd.venue.trimmed()),
     city_(cd.city.trimmed()),
     code_(cd.code),
-    remote_file_(cd.remote_data)
+    remote_file_(cd.remote_data),
+    starttime_(cd.start),
+    endtime_(cd.end)
 {
     assert(cd.code == compute_code(cd.remote_data));
     create_events(cd.events);

@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QString>
 #include <QUrl>
-#include <QSharedPointer>
+#include <QDateTime>
 #include <QDir>
 #include <QList>
 #include <QQmlListProperty>
@@ -31,6 +31,8 @@ class conference : public QObject
     Q_PROPERTY(QString city READ city CONSTANT)
     Q_PROPERTY(QString code READ code CONSTANT)
     Q_PROPERTY(QUrl remote_file READ remote_file CONSTANT)
+    Q_PROPERTY(QDateTime starttime READ starttime CONSTANT)
+    Q_PROPERTY(QDateTime endtime READ endtime CONSTANT)
     Q_PROPERTY(cfs::event_list_model* events READ events NOTIFY eventsChanged)
 
 public:
@@ -46,6 +48,8 @@ public:
     QString city() const { return city_; }
     QString code() const { return code_; }
     QUrl remote_file() const { return remote_file_; }
+    QDateTime starttime() const { return starttime_; }
+    QDateTime endtime() const { return endtime_; }
     cfs::event_list_model* events() const;
 
     static QString compute_code(const QUrl &remote_data_url);
@@ -77,6 +81,8 @@ private:
     QString city_;
     QString code_;
     QUrl remote_file_;
+    QDateTime starttime_;
+    QDateTime endtime_;
 
     QList<cfs::event*> events_;
 
