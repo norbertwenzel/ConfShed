@@ -68,6 +68,13 @@ Page {
                 width: parent.width
                 font.pixelSize: Theme.fontSizeSmall
             }
+            Button {
+                text: conf_event != null && conf_event.favorite ? "Unstar" : "Star event"
+                enabled: conf_event != null
+                visible: enabled
+                onClicked: conf_event.favorite = !conf_event.favorite
+            }
+
             SectionHeader {
                 text: "Abstract"
                 visible: lbl_abstract.visible
@@ -77,9 +84,10 @@ Page {
                 text: conf_event != null ? conf_event.abstract : ""
                 wrapMode: TextEdit.Wrap
                 width: parent.width
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSizeTiny
                 visible: conf_event != null && conf_event.abstract.length > 0
             }
+
             SectionHeader {
                 text: "Description"
                 visible: lbl_description.visible
@@ -89,7 +97,7 @@ Page {
                 text: conf_event != null ? conf_event.description : ""
                 wrapMode: TextEdit.Wrap
                 width: parent.width
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSizeTiny
                 visible: conf_event != null && conf_event.description.length > 0
             }
         }
