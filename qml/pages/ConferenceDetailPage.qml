@@ -57,16 +57,17 @@ Page {
                 title: conf != null ? conf.title : "Conference"
             }
             Label {
-                text: conf != null ? conf.title : ""
-            }
-            Label {
                 text: conf != null ? conf.subtitle : ""
+                visible: conf != null && conf.subtitle.length > 0
+                font.pixelSize: Theme.fontSizeMedium
             }
             Label {
-                text: conf != null ? conf.venue : ""
-            }
-            Label {
-                text: conf != null ? conf.city : ""
+                text: conf != null ?
+                          (conf.venue.length > 0 ? conf.venue : "") +
+                          (conf.venue.length > 0 && conf.city.length > 0 ? ", " : "") +
+                          (conf.city.length > 0 ? conf.city : "")
+                        : ""
+                font.pixelSize: Theme.fontSizeSmall
             }
         }
 
