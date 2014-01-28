@@ -81,13 +81,13 @@ public:
         QSqlQuery query(db_);
         if(d.id == INVALID_ID)
         {
-            query.prepare("INSERT OR REPLACE INTO confs (Title, Subtitle, Venue, City, Code, Url) VALUES (:title, :subtitle, :venue, :city, :code, :url)");
+            query.prepare("INSERT INTO confs (Title, Subtitle, Venue, City, Code, Url) VALUES (:title, :subtitle, :venue, :city, :code, :url)");
             query.bindValue(":code", d.code);
             query.bindValue(":url", d.remote_data);
         }
         else
         {
-            query.prepare("UPDATE OR REPLACE confs SET Title = :title, Subtitle = :subtitle, Venue = :venue, City = :city WHERE Id = :id");
+            query.prepare("UPDATE confs SET Title = :title, Subtitle = :subtitle, Venue = :venue, City = :city WHERE Id = :id");
             query.bindValue(":id", d.id);
         }
         query.bindValue(":title", d.title);
@@ -187,11 +187,16 @@ private:
     {
         assert(db_.open());
 
-        auto res = db_.exec("CREATE TABLE IF NOT EXISTS confs(Id INTEGER PRIMARY KEY, Title TEXT NOT NULL, Venue TEXT, City TEXT, Code TEXT UNIQUE NOT NULL, Url TEXT NOT NULL, Subtitle TEXT)");
+        //TODO check for foreign key support and enable only if necessary/possible
+        auto res = db_.exec("PRAGMA foreign_keys = ON");
+        assert(res.lastError().type() == QSqlError::NoError);
+
+        res = db_.exec("CREATE TABLE IF NOT EXISTS confs(Id INTEGER PRIMARY KEY, Title TEXT NOT NULL, Venue TEXT, City TEXT, Code TEXT UNIQUE NOT NULL, Url TEXT NOT NULL, Subtitle TEXT)");
         //TODO: throw exception, but check where that exception is caught
         assert(res.lastError().type() == QSqlError::NoError);
 
-        res = db_.exec("CREATE TABLE IF NOT EXISTS favs(Id INTEGER PRIMARY KEY, Conference INTEGER NOT NULL, Event INTEGER NOT NULL, FOREIGN KEY(Conference) REFERENCES confs(Id))");
+        res = db_.exec("CREATE TABLE IF NOT EXISTS favs(Id INTEGER PRIMARY KEY, Conference INTEGER NOT NULL, Event INTEGER NOT NULL, "
+                       "FOREIGN KEY(Conference) REFERENCES confs(Id) ON UPDATE CASCADE ON DELETE CASCADE)");
         assert(res.lastError().type() == QSqlError::NoError);
     }
 
