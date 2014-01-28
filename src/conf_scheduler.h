@@ -24,6 +24,9 @@ class event;
 class conf_scheduler : public QObject
 {
     Q_OBJECT
+
+    Q_PROPERTY(bool DEBUG READ is_debug CONSTANT)
+
 public:
     explicit conf_scheduler(QObject *parent = nullptr);
     ~conf_scheduler();
@@ -33,6 +36,15 @@ public:
 
     void star_event(const cfs::conference &conf, const cfs::event &evnt);
     void unstar_event(const cfs::conference &conf, const cfs::event &evnt);
+
+    bool is_debug() const
+    {
+#ifndef NDEBUG
+        return true;
+#else
+        return false;
+#endif
+    }
 
 signals:
     void conferenceListChanged(cfs::conference_list_model *confs) const;
