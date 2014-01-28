@@ -26,6 +26,10 @@ public:
     int add_or_update_conference(const conference_data &d);
     void delete_conference(int conf_id);
 
+    void add_favorite(int conf_id, int event_id);
+    void delete_favorite(int conf_id, int event_id);
+
+
 private:
     class impl;
     std::unique_ptr<impl> impl_;

@@ -182,6 +182,32 @@ public:
         }
     }
 
+    void add_favorite(int conf_id, int event_id)
+    {
+        assert(db_.open());
+
+        QSqlQuery query(db_);
+        query.prepare("INSERT INTO favs (Conference, Event) VALUES (:conf_id, :event_id)");
+        query.bindValue(":conf_id", conf_id);
+        query.bindValue(":event_id", event_id);
+
+        if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
+        assert(query.numRowsAffected() <= 1);
+    }
+
+    void delete_favorite(int conf_id, int event_id)
+    {
+        assert(db_.open());
+
+        QSqlQuery query(db_);
+        query.prepare("DELETE FROM favs WHERE Conference = :conf_id AND Event = :event_id");
+        query.bindValue(":conf_id", conf_id);
+        query.bindValue(":event_id", event_id);
+
+        if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
+        assert(query.numRowsAffected() <= 1);
+    }
+
 private:
     void create_db_if_necessary()
     {
@@ -243,4 +269,16 @@ void storage::delete_conference(int conf_id)
 {
     assert(impl_);
     impl_->delete_conference(conf_id);
+}
+
+void storage::add_favorite(int conf_id, int event_id)
+{
+    assert(impl_);
+    impl_->add_favorite(conf_id, event_id);
+}
+
+void storage::delete_favorite(int conf_id, int event_id)
+{
+    assert(impl_);
+    impl_->delete_favorite(conf_id, event_id);
 }
