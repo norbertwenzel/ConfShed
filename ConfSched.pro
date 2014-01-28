@@ -48,3 +48,7 @@ QT += network
 QT += sql
 
 DEFINES *= QT_USE_QSTRINGBUILDER
+
+CONFIG(release, debug|release) {
+    DEFINES *= NDEBUG
+}
