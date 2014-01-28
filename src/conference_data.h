@@ -39,6 +39,7 @@ struct conference_data
         QList<QString> persons;
         QDateTime starttime;
         QDateTime endtime;
+        bool favorite;
     };
     QList<event_data> events;
 };

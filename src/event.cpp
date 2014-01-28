@@ -25,7 +25,8 @@ event::event(const cfs::detail::conference_data::event_data &data,
     room_(data.room.trimmed()),
     persons_(data.persons),
     start_(data.starttime),
-    end_(data.endtime)
+    end_(data.endtime),
+    favorite_(data.favorite)
 {
     assert(parent != nullptr);
 }

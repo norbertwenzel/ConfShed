@@ -28,7 +28,7 @@ public:
 
     void add_favorite(int conf_id, int event_id);
     void remove_favorite(int conf_id, int event_id);
-
+    std::vector<int> get_favorites(int conf_id) const;
 
 private:
     class impl;

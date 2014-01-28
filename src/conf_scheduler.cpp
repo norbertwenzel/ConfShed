@@ -322,6 +322,27 @@ void conf_scheduler::do_update_conference(cfs::conference *conf,
     data->remote_data = db_data.remote_data;
     data->id = storage_->add_or_update_conference(*data);
 
+    //TODO: check the favorite list for the current conference and set the event status appropriately
+    if(data->events.size() > 0)
+    {
+        auto favorites = storage_->get_favorites(data->id);
+        std::sort(std::begin(favorites), std::end(favorites));
+        assert(std::is_sorted(std::begin(favorites), std::end(favorites)));
+
+        std::for_each(std::begin(data->events), std::end(data->events),
+        [&](decltype(*std::begin(data->events)) &evnt)
+        {
+            evnt.favorite = std::binary_search(std::begin(favorites), std::end(favorites), evnt.id);
+#ifndef NDEBUG
+            if(evnt.favorite)
+            {
+                qDebug() << data->id << ":" << data->title << "contains favorite" <<
+                            evnt.id << ":" << evnt.title;
+            }
+#endif
+        });
+    }
+
     //update the conference
     conf->update_data(*data);
 }

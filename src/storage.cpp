@@ -133,6 +133,7 @@ public:
         if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
 
         std::vector<conference_data> results;
+        results.reserve(query.numRowsAffected());
         while(query.next())
         {
             conference_data d;
@@ -208,6 +209,26 @@ public:
         assert(query.numRowsAffected() <= 1);
     }
 
+    std::vector<int> get_favorites(int conf_id)
+    {
+        assert(db_.open());
+
+        QSqlQuery query(db_);
+        query.prepare("SELECT Event FROM favs WHERE Conference = :conf_id");
+        query.bindValue(":conf_id", conf_id);
+
+        if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
+
+        std::vector<int> results;
+        results.reserve(query.numRowsAffected());
+        while(query.next())
+        {
+            results.push_back(query.value(0).toInt());
+        }
+
+        return results;
+    }
+
 private:
     void create_db_if_necessary()
     {
@@ -281,4 +302,10 @@ void storage::remove_favorite(int conf_id, int event_id)
 {
     assert(impl_);
     impl_->remove_favorite(conf_id, event_id);
+}
+
+std::vector<int> storage::get_favorites(int conf_id) const
+{
+    assert(impl_);
+    return impl_->get_favorites(conf_id);
 }
