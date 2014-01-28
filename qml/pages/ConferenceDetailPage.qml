@@ -29,6 +29,11 @@ Page {
 
         PullDownMenu {
             MenuItem {
+                text: "Update"
+                //TODO update currently only parses the datafile. this should also redownload the file.
+                onClicked: conf.update()
+            }
+            MenuItem {
                 text: "Sort events"
                 onClicked: conf.sort_events()
                 enabled: conf !== null
