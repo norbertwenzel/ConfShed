@@ -19,6 +19,14 @@ Page {
         confOverviewList.model = conf_list;
     }
 
+    function add_debug_conferences() {
+        conf_sched.addConference("https://fosdem.org/2014/schedule/xml");
+        conf_sched.addConference("https://cfp.linuxwochen.at/de/lww2013/public/schedule.xml");
+        conf_sched.addConference("http://sigint.ccc.de/schedule/schedule.xml");
+        conf_sched.addConference("https://pentabarf.junge-piraten.de/fahrplan/om13/schedule.de.xml");
+        conf_sched.addConference("https://pentabarf.junge-piraten.de/fahrplan/om12/schedule.de.xml");
+    }
+
     Component.onCompleted: {
         var confs = conf_sched.get_all_conferences();
         if(confs.length === 1)
@@ -42,16 +50,20 @@ Page {
             title: "Conferences"
         }
 
-        // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
             MenuItem {
-                text: "Update conferences"
-                onClicked: conf_sched.updateAllConferences();
-                enabled: confOverviewList.model.length > 0
+                text: "Add debug data"
+                onClicked: add_debug_conferences();
+                visible: conf_sched.DEBUG
             }
             MenuItem {
                 text: "Add conference"
                 onClicked: add_conference_dialog();
+            }
+            MenuItem {
+                text: "Update all conferences"
+                onClicked: conf_sched.updateAllConferences();
+                visible: confOverviewList.model.length > 0
             }
         }
 
