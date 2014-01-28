@@ -20,7 +20,7 @@ using cfs::detail::storage;
 class storage::impl
 {
     //enum in the same order as the database fields
-    enum { ID, TITLE, VENUE, CITY, CODE, URL, SUBTITLE };
+    enum { ID, TITLE, VENUE, CITY, CODE, URL, SUBTITLE, STARTTIME, ENDTIME };
 
     static const int INVALID_ID = 0;
 
@@ -81,19 +81,23 @@ public:
         QSqlQuery query(db_);
         if(d.id == INVALID_ID)
         {
-            query.prepare("INSERT INTO confs (Title, Subtitle, Venue, City, Code, Url) VALUES (:title, :subtitle, :venue, :city, :code, :url)");
+            query.prepare("INSERT INTO confs (Title, Subtitle, Venue, City, Code, Url, Starttime, Endtime) VALUES "
+                          "(:title, :subtitle, :venue, :city, :code, :url, :starttime, :endtime)");
             query.bindValue(":code", d.code);
             query.bindValue(":url", d.remote_data);
         }
         else
         {
-            query.prepare("UPDATE confs SET Title = :title, Subtitle = :subtitle, Venue = :venue, City = :city WHERE Id = :id");
+            query.prepare("UPDATE confs SET Title = :title, Subtitle = :subtitle, Venue = :venue, City = :city "
+                          "Starttime = :starttime, Endtime = :endtime WHERE Id = :id");
             query.bindValue(":id", d.id);
         }
         query.bindValue(":title", d.title);
         query.bindValue(":subtitle", d.subtitle);
         query.bindValue(":venue", d.venue);
         query.bindValue(":city", d.city);
+        query.bindValue(":starttime", d.start.toString(Qt::ISODate));
+        query.bindValue(":endtime", d.end.toString(Qt::ISODate));
 
         if(!query.exec()) throw std::runtime_error(query.lastError().text().toLocal8Bit().data());
 
@@ -142,6 +146,8 @@ public:
             d.subtitle = query.value(SUBTITLE).toString();
             d.venue = query.value(VENUE).toString();
             d.city = query.value(CITY).toString();
+            d.start = QDateTime::fromString(query.value(STARTTIME).toString(), Qt::ISODate);
+            d.end = QDateTime::fromString(query.value(ENDTIME).toString(), Qt::ISODate);
             d.code = query.value(CODE).toString();
             d.remote_data = query.value(URL).toString();
 
@@ -238,7 +244,8 @@ private:
         auto res = db_.exec("PRAGMA foreign_keys = ON");
         assert(res.lastError().type() == QSqlError::NoError);
 
-        res = db_.exec("CREATE TABLE IF NOT EXISTS confs(Id INTEGER PRIMARY KEY, Title TEXT NOT NULL, Venue TEXT, City TEXT, Code TEXT UNIQUE NOT NULL, Url TEXT NOT NULL, Subtitle TEXT)");
+        res = db_.exec("CREATE TABLE IF NOT EXISTS confs(Id INTEGER PRIMARY KEY, Title TEXT NOT NULL, Venue TEXT, City TEXT, Code TEXT UNIQUE NOT NULL, "
+                       "Url TEXT NOT NULL, Subtitle TEXT, Starttime TEXT NOT NULL, Endtime TEXT NOT NULL)");
         //TODO: throw exception, but check where that exception is caught
         assert(res.lastError().type() == QSqlError::NoError);
 
