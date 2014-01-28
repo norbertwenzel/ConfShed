@@ -67,6 +67,12 @@ Page {
             }
             Label {
                 text: conf != null ?
+                          Qt.formatDate(conf.starttime, Qt.LocalDate) + " - " + Qt.formatDate(conf.endtime, Qt.LocalDate)
+                        : ""
+                font.pixelSize: Theme.fontSizeSmall
+            }
+            Label {
+                text: conf != null ?
                           (conf.venue.length > 0 ? conf.venue : "") +
                           (conf.venue.length > 0 && conf.city.length > 0 ? ", " : "") +
                           (conf.city.length > 0 ? conf.city : "")
