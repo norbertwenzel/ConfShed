@@ -17,7 +17,7 @@ Page {
     Component.onCompleted: {
         if(conf != null) {
             conf.eventsChanged.connect(show_event_list);
-            conf.update();
+            conf.update(false, true);
         }
     }
 
@@ -30,8 +30,7 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: "Update"
-                //TODO update currently only parses the datafile. this should also redownload the file.
-                onClicked: conf.update()
+                onClicked: conf.update(true, true)
             }
             MenuItem {
                 text: "Sort events"

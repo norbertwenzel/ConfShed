@@ -188,7 +188,7 @@ void conf_scheduler::removeConference(cfs::conference *conf)
     emit conferenceListChanged(get_all_conferences());
 }
 
-void conf_scheduler::updateConference(cfs::conference *conf)
+void conf_scheduler::updateConference(cfs::conference *conf, bool update_remote_data, bool update_full_event)
 {
     if(!conf)
     {
@@ -200,7 +200,7 @@ void conf_scheduler::updateConference(cfs::conference *conf)
 
     try
     {
-        do_update_conference(conf, false, true);
+        do_update_conference(conf, update_remote_data, update_full_event);
         emit conf->eventsChanged(); //TODO: call signal inside conference and only when necessary
     }
     catch(const std::exception &e)
@@ -290,7 +290,7 @@ std::unique_ptr<cfs::detail::conference_data> conf_scheduler::parse_conference_c
 
 void conf_scheduler::do_update_conference(cfs::conference *conf,
                                           bool update_remote_file,
-                                          bool update_all_events)
+                                          bool update_full_event)
 {
     assert(storage_);
     const auto &db_data = storage_->get_conference(conf->conf_id());
@@ -306,7 +306,7 @@ void conf_scheduler::do_update_conference(cfs::conference *conf,
 
     //parse the necessary conference data
     decltype(parse_conference_complete(local_data_file)) data;
-    if(update_all_events)
+    if(update_full_event)
     {
         data = parse_conference_complete(local_data_file);
     }

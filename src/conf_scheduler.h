@@ -54,7 +54,7 @@ signals:
 public slots:
     void addConference(const QUrl &conf_data_url);
     void removeConference(cfs::conference *conf);
-    void updateConference(cfs::conference *conf);
+    void updateConference(cfs::conference *conf, bool update_remote_data, bool update_full_event);
     void updateAllConferences();
 
 private:
@@ -65,7 +65,7 @@ private:
     std::unique_ptr<detail::conference_data> parse_conference_header(const QUrl &local_data_file) const;
     std::unique_ptr<detail::conference_data> parse_conference_complete(const QUrl &local_data_file) const;
 
-    void do_update_conference(cfs::conference *conf, bool update_remote_file, bool update_all_events);
+    void do_update_conference(cfs::conference *conf, bool update_remote_file, bool update_full_event);
 
 private:
     static const QString STORAGE_IDENTIFIER;

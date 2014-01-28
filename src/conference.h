@@ -58,7 +58,7 @@ signals:
     void eventsChanged() const;
 
 public slots:
-    void update();
+    void update(bool update_remote_data, bool update_full_event);
 
     //TODO use http://qt-project.org/doc/qt-5.0/qtcore/qsortfilterproxymodel.html instead
     void sort_events();

@@ -110,11 +110,11 @@ void conference::unstar_event(const cfs::event &e)
     else throw std::runtime_error("Conference has no valid parent element;");
 }
 
-void conference::update()
+void conference::update(bool update_remote_data, bool update_full_event)
 {
     const auto parent_ptr = qobject_cast<cfs::conf_scheduler*>(parent());
     assert(parent_ptr);
-    if(parent_ptr) parent_ptr->updateConference(this);
+    if(parent_ptr) parent_ptr->updateConference(this, update_remote_data, update_full_event);
 }
 
 void conference::sort_events()
