@@ -88,7 +88,7 @@ public:
         }
         else
         {
-            query.prepare("UPDATE confs SET Title = :title, Subtitle = :subtitle, Venue = :venue, City = :city "
+            query.prepare("UPDATE confs SET Title = :title, Subtitle = :subtitle, Venue = :venue, City = :city, "
                           "Starttime = :starttime, Endtime = :endtime WHERE Id = :id");
             query.bindValue(":id", d.id);
         }
