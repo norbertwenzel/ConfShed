@@ -68,11 +68,17 @@ Page {
                 width: parent.width
                 font.pixelSize: Theme.fontSizeSmall
             }
-            Button {
-                text: conf_event != null && conf_event.favorite ? "Unstar" : "Star event"
+            TextSwitch {
+                text: "Favorite"
                 enabled: conf_event != null
                 visible: enabled
-                onClicked: conf_event.favorite = !conf_event.favorite
+                automaticCheck: false
+                checked: conf_event != null && conf_event.favorite
+                onClicked: {
+                    busy = true;
+                    conf_event.favorite = !conf_event.favorite;
+                    busy = false;
+                }
             }
 
             SectionHeader {
