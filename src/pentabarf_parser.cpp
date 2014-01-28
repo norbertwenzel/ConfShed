@@ -76,6 +76,8 @@ std::unique_ptr<conference_data> pentabarf_parser::parse_conf(QXmlStreamReader &
         static const auto SUBTITLE_TAG = "subtitle";
         static const auto VENUE_TAG = "venue";
         static const auto CITY_TAG = "city";
+        static const auto START_TAG = "start";
+        static const auto END_TAG = "end";
 
         if(token == QXmlStreamReader::StartElement)
         {
@@ -95,6 +97,14 @@ std::unique_ptr<conference_data> pentabarf_parser::parse_conf(QXmlStreamReader &
             else if(xml.name() == CITY_TAG)
             {
                 d->city = parse_conf_city(xml);
+            }
+            else if(xml.name() == START_TAG)
+            {
+                d->start = parse_conf_start(xml);
+            }
+            else if(xml.name() == END_TAG)
+            {
+                d->end = parse_conf_end(xml);
             }
         }
         else if(token == QXmlStreamReader::EndElement &&
@@ -138,6 +148,22 @@ QString pentabarf_parser::parse_conf_city(QXmlStreamReader &xml)
 {
     assert(xml.isStartElement());
     return xml.readElementText();
+}
+
+QDateTime pentabarf_parser::parse_conf_start(QXmlStreamReader &xml)
+{
+    assert(xml.isStartElement());
+    const auto date = QDate::fromString(xml.readElementText(), "yyyy-MM-dd");
+    assert(!date.isNull() && date.isValid());
+    return QDateTime(date, QTime(0, 0));
+}
+
+QDateTime pentabarf_parser::parse_conf_end(QXmlStreamReader &xml)
+{
+    assert(xml.isStartElement());
+    const auto date = QDate::fromString(xml.readElementText(), "yyyy-MM-dd");
+    assert(!date.isNull() && date.isValid());
+    return QDateTime(date, QTime(23, 59, 59, 999));
 }
 
 //methods for parsing the conference events data

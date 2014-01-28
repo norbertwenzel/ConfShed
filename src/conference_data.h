@@ -21,6 +21,8 @@ struct conference_data
     QString subtitle;
     QString venue;
     QString city;
+    QDateTime start;
+    QDateTime end;
 
     //needed for db storage
     int id;

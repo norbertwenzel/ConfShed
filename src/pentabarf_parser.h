@@ -5,6 +5,7 @@
 
 #include <QString>
 #include <QList>
+#include <QDateTime>
 
 #include "conference_data.h"
 
@@ -34,6 +35,8 @@ private:
     QString parse_conf_subtitle(QXmlStreamReader &xml);
     QString parse_conf_venue(QXmlStreamReader &xml);
     QString parse_conf_city(QXmlStreamReader &xml);
+    QDateTime parse_conf_start(QXmlStreamReader &xml);
+    QDateTime parse_conf_end(QXmlStreamReader &xml);
 
     //methods for parsing the conference events data
     typedef conference_data::event_data event_data;
