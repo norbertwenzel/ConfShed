@@ -79,15 +79,16 @@ Page {
 
         delegate: ListItem {
             width: confDetailView.width
-            contentHeight: confTitleLable.height
+            contentHeight: eventTitleLabel.height
 
             //Column {
                 Label {
-                    id: confTitleLable
+                    id: eventTitleLabel
                     text: model.title
                     wrapMode: TextEdit.Wrap
                     width: parent.width
                     font.pixelSize: Theme.fontSizeSmall
+                    font.bold: model.favorite
                 }
            /*     Label {
                     text: model.subtitle.length !== 0 ? model.subtitle : ""
