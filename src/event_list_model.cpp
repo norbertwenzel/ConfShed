@@ -29,6 +29,7 @@ QHash<int, QByteArray> event_list_model::roleNames() const
     roles[ROLE_PERSONS] = "persons";
     roles[ROLE_STARTTIME] = "starttime";
     roles[ROLE_ENDTIME] = "endttime";
+    roles[ROLE_FAVORITE] = "favorite";
     return roles;
 }
 
@@ -76,6 +77,9 @@ QVariant event_list_model::data(const QModelIndex &index, int role) const
         break;
     case ROLE_ENDTIME:
         return cur_event->endtime();
+        break;
+    case ROLE_FAVORITE:
+        return cur_event->favorite();
         break;
 
     default:

@@ -42,7 +42,8 @@ private:
         ROLE_ROOM,
         ROLE_PERSONS,
         ROLE_STARTTIME,
-        ROLE_ENDTIME
+        ROLE_ENDTIME,
+        ROLE_FAVORITE
     };
 
     std::vector<cfs::event*> data_;
