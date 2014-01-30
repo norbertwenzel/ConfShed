@@ -20,6 +20,7 @@ class conference_data;
 } //namespace detail
 
 class event;
+class conference_list_model;
 
 class conf_scheduler : public QObject
 {
@@ -32,10 +33,12 @@ public:
     ~conf_scheduler();
 
     Q_INVOKABLE int get_num_conferences() const;
-    Q_INVOKABLE cfs::conference_list_model* get_all_conferences() const;
+    Q_INVOKABLE cfs::conference_list_model* get_all_conferences();
 
     void star_event(const cfs::conference &conf, const cfs::event &evnt);
     void unstar_event(const cfs::conference &conf, const cfs::event &evnt);
+
+    void removeConference(cfs::conference *conf);
 
     bool is_debug() const
     {
@@ -53,7 +56,6 @@ signals:
 
 public slots:
     void addConference(const QUrl &conf_data_url);
-    void removeConference(cfs::conference *conf);
     void updateConference(cfs::conference *conf, bool update_remote_data, bool update_full_event);
     void updateAllConferences();
 
@@ -70,6 +72,7 @@ private:
 private:
     static const QString STORAGE_IDENTIFIER;
     std::unique_ptr<detail::storage> storage_;
+    conference_list_model *conferences_;
 };
 
 } //namespace cfs

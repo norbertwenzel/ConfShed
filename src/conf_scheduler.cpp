@@ -21,7 +21,8 @@ const QString conf_scheduler::STORAGE_IDENTIFIER("data.db");
 
 conf_scheduler::conf_scheduler(QObject *parent) :
     QObject(parent),
-    storage_(new detail::storage(get_existing_data_dir().filePath(STORAGE_IDENTIFIER)))
+    storage_(new detail::storage(get_existing_data_dir().filePath(STORAGE_IDENTIFIER))),
+    conferences_(nullptr)
 {
     assert(storage_);
 }
@@ -46,11 +47,18 @@ int conf_scheduler::get_num_conferences() const
     }
 }
 
-cfs::conference_list_model* conf_scheduler::get_all_conferences() const
+cfs::conference_list_model* conf_scheduler::get_all_conferences()
 {
-    QList<cfs::conference*> all_confs;
+    //prefer cached list of conferences if available
+    if(conferences_)
+    {
+        return conferences_;
+    }
+
     try
     {
+        QList<cfs::conference*> all_confs;
+
         assert(storage_);
         const auto &all_data = storage_->get_conferences();
         qDebug() << "Trying to load" << all_data.size() << "conferences.";
@@ -65,23 +73,17 @@ cfs::conference_list_model* conf_scheduler::get_all_conferences() const
         });
 
         assert(all_confs.size() == get_num_conferences());
+
+        //TODO store in cache so get function with lazy init stays const
+        conferences_ = new cfs::conference_list_model(all_confs, const_cast<conf_scheduler*>(this));
     }
     catch(const std::exception &e)
     {
         emit error(QString::fromLocal8Bit(e.what()));
-        all_confs.clear();
     }
 
-#ifndef NDEBUG
-    //make sure we have only cfs::conference* in that list
-    std::for_each(std::begin(all_confs), std::end(all_confs),
-    [](decltype(*std::begin(all_confs)) &c)
-    {
-        assert(qobject_cast<cfs::conference*>(c));
-    });
-#endif
-
-    return new cfs::conference_list_model(all_confs, const_cast<conf_scheduler*>(this));
+    assert(conferences_);
+    return conferences_;
 }
 
 void conf_scheduler::star_event(const cfs::conference &conf, const cfs::event &evnt)
@@ -165,20 +167,34 @@ void conf_scheduler::removeConference(cfs::conference *conf)
 
     try
     {
-        //delete data file
-        QFile file(get_data_file_location(conf->code(), ".xml").path());
-        assert(file.exists());
-        if(file.exists())
+        assert(conf);
+
+        //check if the given conference is actually ours
+        if(conferences_ && conferences_->get(conf->conf_id()) == conf)
         {
-            if(!file.remove()) throw std::runtime_error("Could not delete conference data.");
+            //delete data file
+            QFile file(get_data_file_location(conf->code(), ".xml").path());
+            if(file.exists())
+            {
+                if(!file.remove()) throw std::runtime_error("Could not delete conference data.");
+            }
+            assert(!file.exists());
+
+            //delete item from db
+            assert(storage_);
+            storage_->delete_conference(conf->conf_id());
+
+            //clear the actual conf object
+            conf->deleteLater();
         }
-
-        //delete item from db
-        assert(storage_);
-        storage_->delete_conference(conf->conf_id());
-
-        //clear the actual conf object
-        conf->deleteLater();
+        else
+        {
+            qDebug() << conf << conf->title() << ":" << conf->conf_id() <<
+                        "is unhandled in here. Ignored.";
+            static const bool tried_to_delete_unhandled_conf = false;
+            assert(tried_to_delete_unhandled_conf);
+            return;
+        }
     }
     catch(const std::exception &e)
     {
@@ -186,7 +202,7 @@ void conf_scheduler::removeConference(cfs::conference *conf)
         return;
     }
 
-    emit conferenceListChanged(get_all_conferences());
+    //emit conferenceListChanged(get_all_conferences());
 }
 
 void conf_scheduler::updateConference(cfs::conference *conf, bool update_remote_data, bool update_full_event)
