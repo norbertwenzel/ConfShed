@@ -91,8 +91,8 @@ Page {
 
         delegate: ListItem {
 
-            function remove(item) {
-                remorseAction("Deleting " + item.title, function() { conf_sched.removeConference(item); });
+            function remove() {
+                remorseAction("Deleting " + model.title, function() { confOverviewList.model.removeRow(index); });
             }
             function show_details(item) {
                 console.log("show_details[" + index + "]: " + item.conf_id + " " + item.title);
@@ -107,7 +107,7 @@ Page {
                 }
                 MenuItem {
                     text: "Delete"
-                    onClicked: remove(confOverviewList.model.get(model.conf_id))
+                    onClicked: remove();
                 }
             }
 
