@@ -65,10 +65,6 @@ public slots:
     void update(bool update_remote_data, bool update_full_event);
     void unsubscribe();
 
-    //TODO use http://qt-project.org/doc/qt-5.0/qtcore/qsortfilterproxymodel.html instead
-    void sort_events();
-    void filter_events();
-
 private:
     void create_events(const QList<detail::conference_data::event_data> &ed);
 
@@ -86,10 +82,6 @@ private:
     QDateTime endtime_;
 
     QList<cfs::event*> events_;
-
-private:
-    struct cache;
-    std::unique_ptr<cache> cache_;
 };
 
 } //namespace cfs
