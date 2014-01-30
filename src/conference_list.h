@@ -24,6 +24,9 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
+    Q_INVOKABLE bool removeRow(int row, const QModelIndex &parent = QModelIndex());
+    Q_INVOKABLE bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+
     Q_INVOKABLE cfs::conference* get(int id) const;
 
 signals:

@@ -3,6 +3,8 @@
 #include <cassert>
 #include <algorithm>
 
+#include <QDebug>
+
 #include "conference.h"
 
 using cfs::conference_list_model;
@@ -84,6 +86,33 @@ QVariant conference_list_model::headerData(int section, Qt::Orientation orientat
     {
         return QString("Row %1").arg(section);
     }
+}
+
+bool conference_list_model::removeRow(int row, const QModelIndex &parent)
+{
+    removeRows(row, 1, parent);
+}
+
+bool conference_list_model::removeRows(int row, int count, const QModelIndex&)
+{
+    qDebug() << "row =" << row << "count =" << count;
+
+    if(row < 0 || row >= rowCount())
+    {
+        return false;
+    }
+
+    beginRemoveRows(QModelIndex(), row, row + count-1);
+
+    for(int cur = 0; cur < count; ++cur)
+    {
+        //actually delete the data
+        data_.at(row)->unsubscribe();
+        data_.removeAt(row);
+    }
+
+    endRemoveRows();
+    return true;
 }
 
 cfs::conference* conference_list_model::get(const int id) const
