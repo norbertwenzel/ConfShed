@@ -96,12 +96,15 @@ void event_list_model::sort(int, Qt::SortOrder)
 {
     qDebug();
 
+    emit layoutAboutToBeChanged();
+
     std::sort(std::begin(data_), std::end(data_),
     [](const cfs::event *e1, const cfs::event *e2)
     {
         return e1->title() < e2->title();
     });
 
+    changePersistentIndex(createIndex(0, 0), createIndex(rowCount() - 1, 0));
     emit layoutChanged();
 }
 
