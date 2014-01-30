@@ -13,10 +13,12 @@ namespace cfs
 class event_list_model : public QAbstractListModel
 {
     Q_OBJECT
+    Q_ENUMS(sort_criteria)
 
     Q_PROPERTY(int length READ rowCount CONSTANT)
 
 public:
+    enum sort_criteria { Title, Track, Date };
     explicit event_list_model(QObject *parent = nullptr);
     explicit event_list_model(std::vector<cfs::event*> list, QObject *parent = nullptr);
 
@@ -27,7 +29,7 @@ public:
 
     Q_INVOKABLE bool make_item_favorite(int index, bool favorite);
 
-    Q_INVOKABLE void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
+    Q_INVOKABLE void sort_by(sort_criteria criterion, Qt::SortOrder order = Qt::AscendingOrder);
 
     Q_INVOKABLE cfs::event* get(int id) const;
 

@@ -92,16 +92,54 @@ QVariant event_list_model::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void event_list_model::sort(int, Qt::SortOrder)
+void event_list_model::sort_by(event_list_model::sort_criteria criterion,
+                               Qt::SortOrder order /* = Qt::AscendingOrder */)
 {
     qDebug();
 
     emit layoutAboutToBeChanged();
 
     std::sort(std::begin(data_), std::end(data_),
-    [](const cfs::event *e1, const cfs::event *e2)
+    [=](const cfs::event *e1, const cfs::event *e2) -> bool
     {
-        return e1->title() < e2->title();
+        if(criterion == Title)
+        {
+            if(order == Qt::AscendingOrder)
+            {
+                return e1->title() < e2->title();
+            }
+            else
+            {
+                assert(order == Qt::DescendingOrder);
+                return e1->title() > e2->title();
+            }
+        }
+        else if(criterion == Track)
+        {
+            if(order == Qt::AscendingOrder)
+            {
+                return e1->track() < e2->track();
+            }
+            else
+            {
+                assert(order == Qt::DescendingOrder);
+                return e1->track() > e2->track();
+            }
+        }
+        else if(criterion == Date)
+        {
+            if(order == Qt::AscendingOrder)
+            {
+                return e1->starttime() < e2->starttime();
+            }
+            else
+            {
+                assert(order == Qt::DescendingOrder);
+                return e1->starttime() > e2->starttime();
+            }
+        }
+        assert(false);
+        return false;
     });
 
     changePersistentIndex(createIndex(0, 0), createIndex(rowCount() - 1, 0));

@@ -33,8 +33,24 @@ Page {
                 onClicked: conf.update(true, true)
             }
             MenuItem {
-                text: "Sort events"
-                onClicked: confDetailView.model.sort(0)
+                text: "Sort by date"
+                onClicked: {
+                    confDetailView.model.sort_by(ConferenceEventList.Date)
+                }
+                enabled: confDetailView.count > 0 && conf !== null
+            }
+            MenuItem {
+                text: "Sort by title"
+                onClicked: {
+                    confDetailView.model.sort_by(ConferenceEventList.Title)
+                }
+                enabled: confDetailView.count > 0 && conf !== null
+            }
+            MenuItem {
+                text: "Sort by track"
+                onClicked: {
+                    confDetailView.model.sort_by(ConferenceEventList.Track)
+                }
                 enabled: confDetailView.count > 0 && conf !== null
             }
         }
