@@ -177,7 +177,8 @@ void conf_scheduler::removeConference(cfs::conference *conf)
         assert(storage_);
         storage_->delete_conference(conf->conf_id());
 
-        //TODO: clear the conf object to free as much memory as possible
+        //clear the actual conf object
+        conf->deleteLater();
     }
     catch(const std::exception &e)
     {
