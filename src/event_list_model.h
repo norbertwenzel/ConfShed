@@ -25,6 +25,8 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
+    Q_INVOKABLE bool make_item_favorite(int index, bool favorite);
+
     Q_INVOKABLE void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 
     Q_INVOKABLE cfs::event* get(int id) const;

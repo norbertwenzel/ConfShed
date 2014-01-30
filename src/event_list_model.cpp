@@ -125,6 +125,20 @@ QVariant event_list_model::headerData(int section, Qt::Orientation orientation, 
     }
 }
 
+bool event_list_model::make_item_favorite(int index, bool favorite)
+{
+    qDebug() << index << favorite;
+
+    if(index < 0 || index >= rowCount())
+    {
+        return false;
+    }
+
+    data_.at(index)->favorite(favorite);
+    emit dataChanged(createIndex(index, 0), createIndex(index, 0));
+    return true;
+}
+
 cfs::event* event_list_model::get(int id) const
 {
     const auto result_iter = std::find_if(std::begin(data_), std::end(data_),
