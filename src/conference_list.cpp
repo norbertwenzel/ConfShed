@@ -90,7 +90,7 @@ QVariant conference_list_model::headerData(int section, Qt::Orientation orientat
 
 bool conference_list_model::removeRow(int row, const QModelIndex &parent)
 {
-    removeRows(row, 1, parent);
+    return removeRows(row, 1, parent);
 }
 
 bool conference_list_model::removeRows(int row, int count, const QModelIndex &parent)
