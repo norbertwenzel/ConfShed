@@ -69,6 +69,23 @@ QVariant conference_list_model::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+QVariant conference_list_model::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(role != Qt::DisplayRole)
+    {
+        return QVariant();
+    }
+
+    if(orientation == Qt::Horizontal)
+    {
+        return QString("Column %1").arg(section);
+    }
+    else
+    {
+        return QString("Row %1").arg(section);
+    }
+}
+
 cfs::conference* conference_list_model::get(const int id) const
 {
     const auto result_iter = std::find_if(std::begin(data_), std::end(data_),
