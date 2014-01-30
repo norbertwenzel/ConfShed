@@ -33,9 +33,13 @@ Page {
                 onClicked: conf.update(true, true)
             }
             MenuItem {
-                text: "Sort by date"
+                text: "Sort by day"
                 onClicked: {
-                    confDetailView.model.sort_by(ConferenceEventList.Date)
+                    confDetailView.model.sort_by(ConferenceEventList.Day);
+                    confDetailView.section.property = 'weekday';
+                    confDetailView.section.delegate = {
+                        text: confDetailView.section
+                    }
                 }
                 enabled: confDetailView.count > 0 && conf !== null
             }
@@ -43,6 +47,11 @@ Page {
                 text: "Sort by title"
                 onClicked: {
                     confDetailView.model.sort_by(ConferenceEventList.Title)
+                    confDetailView.section.property = 'title';
+                    confDetailView.section.criteria = ViewSection.FirstCharacter;
+                    confDetailView.section.delegate = {
+                        text: confDetailView.section.slice(0, 1)
+                    }
                 }
                 enabled: confDetailView.count > 0 && conf !== null
             }
@@ -50,6 +59,11 @@ Page {
                 text: "Sort by track"
                 onClicked: {
                     confDetailView.model.sort_by(ConferenceEventList.Track)
+                    confDetailView.section.property = 'track'
+                    confDetailView.section.criteria = ViewSection.FullString
+                    confDetailView.section.delegate = {
+                        text: confDetailView.section
+                    }
                 }
                 enabled: confDetailView.count > 0 && conf !== null
             }

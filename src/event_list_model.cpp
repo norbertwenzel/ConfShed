@@ -32,6 +32,7 @@ QHash<int, QByteArray> event_list_model::roleNames() const
     roles[ROLE_STARTTIME] = "starttime";
     roles[ROLE_ENDTIME] = "endttime";
     roles[ROLE_FAVORITE] = "favorite";
+    roles[ROLE_WEEKDAY] = "weekday";
     return roles;
 }
 
@@ -83,6 +84,9 @@ QVariant event_list_model::data(const QModelIndex &index, int role) const
     case ROLE_FAVORITE:
         return cur_event->favorite();
         break;
+    case ROLE_WEEKDAY:
+        return cur_event->starttime().toString("dddd");
+        break;
 
     default:
         assert(false);
@@ -126,7 +130,7 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
                 return e1->track() > e2->track();
             }
         }
-        else if(criterion == Date)
+        else if(criterion == Day)
         {
             if(order == Qt::AscendingOrder)
             {

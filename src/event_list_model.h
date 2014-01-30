@@ -18,7 +18,7 @@ class event_list_model : public QAbstractListModel
     Q_PROPERTY(int length READ rowCount CONSTANT)
 
 public:
-    enum sort_criteria { Title, Track, Date };
+    enum sort_criteria { Title, Track, Day };
     explicit event_list_model(QObject *parent = nullptr);
     explicit event_list_model(std::vector<cfs::event*> list, QObject *parent = nullptr);
 
@@ -50,7 +50,8 @@ private:
         ROLE_PERSONS,
         ROLE_STARTTIME,
         ROLE_ENDTIME,
-        ROLE_FAVORITE
+        ROLE_FAVORITE,
+        ROLE_WEEKDAY
     };
 
     std::vector<cfs::event*> data_;
