@@ -3,6 +3,8 @@
 #include <cassert>
 #include <algorithm>
 
+#include <QDebug>
+
 using cfs::event_list_model;
 
 event_list_model::event_list_model(QObject *parent) :
@@ -88,6 +90,36 @@ QVariant event_list_model::data(const QModelIndex &index, int role) const
     }
 
     return QVariant();
+}
+
+void event_list_model::sort(int, Qt::SortOrder)
+{
+    qDebug();
+
+    std::sort(std::begin(data_), std::end(data_),
+    [](const cfs::event *e1, const cfs::event *e2)
+    {
+        return e1->title() < e2->title();
+    });
+
+    emit layoutChanged();
+}
+
+QVariant event_list_model::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(role != Qt::DisplayRole)
+    {
+        return QVariant();
+    }
+
+    if(orientation == Qt::Horizontal)
+    {
+        return QString("Column %1").arg(section);
+    }
+    else
+    {
+        return QString("Row %1").arg(section);
+    }
 }
 
 cfs::event* event_list_model::get(int id) const

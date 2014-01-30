@@ -34,8 +34,8 @@ Page {
             }
             MenuItem {
                 text: "Sort events"
-                onClicked: conf.sort_events()
-                enabled: conf !== null
+                onClicked: confDetailView.model.sort(0)
+                enabled: confDetailView.count > 0 && conf !== null
             }
         }
 
