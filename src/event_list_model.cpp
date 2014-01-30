@@ -2,19 +2,23 @@
 
 #include <cassert>
 #include <algorithm>
+#include <iterator>
 
 #include <QDebug>
 
 using cfs::event_list_model;
 
 event_list_model::event_list_model(QObject *parent) :
-    QAbstractListModel(parent)
+    QAbstractListModel(parent),
+    data_(),
+    filtered_size_(-1)
 {
 }
 
 event_list_model::event_list_model(std::vector<cfs::event*> list, QObject *parent) :
     QAbstractListModel(parent),
-    data_(std::move(list))
+    data_(std::move(list)),
+    filtered_size_(-1)
 {
 }
 
@@ -38,7 +42,7 @@ QHash<int, QByteArray> event_list_model::roleNames() const
 
 int event_list_model::rowCount(const QModelIndex&) const
 {
-    return data_.size();
+    return filtered_size_ >= 0 ? filtered_size_ : data_.size();
 }
 
 QVariant event_list_model::data(const QModelIndex &index, int role) const
@@ -49,6 +53,7 @@ QVariant event_list_model::data(const QModelIndex &index, int role) const
     }
 
     const auto &cur_event = data_[index.row()];
+    assert(cur_event);
     switch(role)
     {
     case ROLE_ID:
@@ -85,7 +90,7 @@ QVariant event_list_model::data(const QModelIndex &index, int role) const
         return cur_event->favorite();
         break;
     case ROLE_WEEKDAY:
-        return cur_event->starttime().toString("dddd");
+        return get_weekday(*cur_event);
         break;
 
     default:
@@ -106,7 +111,7 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
     std::sort(std::begin(data_), std::end(data_),
     [=](const cfs::event *e1, const cfs::event *e2) -> bool
     {
-        if(criterion == Title)
+        if(criterion == SortTitle)
         {
             if(order == Qt::AscendingOrder)
             {
@@ -118,7 +123,7 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
                 return e1->title() > e2->title();
             }
         }
-        else if(criterion == Track)
+        else if(criterion == SortTrack)
         {
             if(order == Qt::AscendingOrder)
             {
@@ -130,7 +135,7 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
                 return e1->track() > e2->track();
             }
         }
-        else if(criterion == Day)
+        else if(criterion == SortDay)
         {
             if(order == Qt::AscendingOrder)
             {
@@ -148,6 +153,61 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
 
     changePersistentIndex(createIndex(0, 0), createIndex(rowCount() - 1, 0));
     emit layoutChanged();
+}
+
+void event_list_model::filter_by(event_list_model::filter_criteria criterion, QString the_filter)
+{
+    qDebug() << criterion << the_filter;
+
+    if(criterion == FilterNone)
+    {
+        filter_.clear();
+        beginInsertRows(QModelIndex(), rowCount(), data_.size() - rowCount());
+        filtered_size_ = -1;
+        emit endInsertRows();
+
+        return;
+    }
+
+    assert(criterion != FilterNone);
+    filter_ = std::move(the_filter);
+
+    emit layoutAboutToBeChanged();
+
+    int new_size = -1;
+    if(criterion == FilterTrack)
+    {
+        const auto it = std::stable_partition(std::begin(data_), std::end(data_),
+        [&](const cfs::event *evt){ return QString::compare(evt->track(), filter_, Qt::CaseInsensitive) == 0; });
+
+        new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
+        qDebug() << "Filtered" << new_size << "events for track" << filter_;
+    }
+    else if(criterion == FilterDay)
+    {
+        const auto it = std::stable_partition(std::begin(data_), std::end(data_),
+        [&](const cfs::event *evt){ return QString::compare(get_weekday(*evt), filter_, Qt::CaseInsensitive) == 0; });
+
+        new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
+        qDebug() << "Filtered" << new_size << "events for day" << filter_;
+    }
+    else if(criterion == FilterCurrentTime)
+    {
+        const auto it = std::stable_partition(std::begin(data_), std::end(data_),
+        [&](const cfs::event *evt){ return evt->starttime() > QDateTime::currentDateTime(); });
+
+        new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
+        qDebug() << "Filtered" << new_size << "events with starttime >" << QDateTime::currentDateTime();
+    }
+
+    changePersistentIndex(createIndex(0, 0), createIndex(rowCount() - 1, 0));
+    emit layoutChanged();
+
+    beginRemoveRows(QModelIndex(), new_size, data_.size());
+
+    filtered_size_ = new_size;
+
+    emit endRemoveRows();
 }
 
 QVariant event_list_model::headerData(int section, Qt::Orientation orientation, int role) const
@@ -189,4 +249,9 @@ cfs::event* event_list_model::get(int id) const
                                 return ev->event_id() == id;
                             });
     return result_iter != std::end(data_) ? *result_iter : nullptr;
+}
+
+QString event_list_model::get_weekday(const cfs::event &evt) const
+{
+    return evt.starttime().toString("dddd");
 }

@@ -14,11 +14,13 @@ class event_list_model : public QAbstractListModel
 {
     Q_OBJECT
     Q_ENUMS(sort_criteria)
+    Q_ENUMS(filter_criteria)
 
     Q_PROPERTY(int length READ rowCount CONSTANT)
 
 public:
-    enum sort_criteria { Title, Track, Day };
+    enum sort_criteria { SortTitle, SortTrack, SortDay };
+    enum filter_criteria { FilterNone, FilterTrack, FilterDay, FilterCurrentTime };
     explicit event_list_model(QObject *parent = nullptr);
     explicit event_list_model(std::vector<cfs::event*> list, QObject *parent = nullptr);
 
@@ -30,12 +32,16 @@ public:
     Q_INVOKABLE bool make_item_favorite(int index, bool favorite);
 
     Q_INVOKABLE void sort_by(sort_criteria criterion, Qt::SortOrder order = Qt::AscendingOrder);
+    Q_INVOKABLE void filter_by(filter_criteria criterion, QString the_filter);
 
     Q_INVOKABLE cfs::event* get(int id) const;
 
 signals:
 
 public slots:
+
+private:
+    QString get_weekday(const cfs::event &evt) const;
 
 private:
     enum event_roles
@@ -55,6 +61,8 @@ private:
     };
 
     std::vector<cfs::event*> data_;
+    int filtered_size_;
+    QString filter_;
 };
 
 } //namespace cfs
