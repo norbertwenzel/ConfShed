@@ -119,6 +119,13 @@ void conference::update(bool update_remote_data, bool update_full_event)
     if(parent_ptr) parent_ptr->updateConference(this, update_remote_data, update_full_event);
 }
 
+void conference::unsubscribe()
+{
+    const auto parent_ptr = qobject_cast<cfs::conf_scheduler*>(parent());
+    assert(parent_ptr);
+    if(parent_ptr) parent_ptr->removeConference(this);
+}
+
 void conference::sort_events()
 {
     qDebug() << "cache =" << static_cast<bool>(cache_);
