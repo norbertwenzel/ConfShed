@@ -93,7 +93,7 @@ bool conference_list_model::removeRow(int row, const QModelIndex &parent)
     removeRows(row, 1, parent);
 }
 
-bool conference_list_model::removeRows(int row, int count, const QModelIndex&)
+bool conference_list_model::removeRows(int row, int count, const QModelIndex &parent)
 {
     qDebug() << "row =" << row << "count =" << count;
 
@@ -102,7 +102,7 @@ bool conference_list_model::removeRows(int row, int count, const QModelIndex&)
         return false;
     }
 
-    beginRemoveRows(QModelIndex(), row, row + count-1);
+    beginRemoveRows(parent, row, row + count-1);
 
     for(int cur = 0; cur < count; ++cur)
     {
@@ -123,4 +123,13 @@ cfs::conference* conference_list_model::get(const int id) const
                                 return conf->conf_id() == id;
                             });
     return result_iter != std::end(data_) ? *result_iter : nullptr;
+}
+
+void conference_list_model::add_conference(cfs::conference *conf)
+{
+    qDebug() << "New conference:" << conf->title() << ":" << conf->conf_id();
+
+    beginInsertRows(QModelIndex(), rowCount(), rowCount()+1);
+    data_.append(conf);
+    endInsertRows();
 }

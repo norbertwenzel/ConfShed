@@ -29,6 +29,8 @@ public:
 
     Q_INVOKABLE cfs::conference* get(int id) const;
 
+    void add_conference(cfs::conference *conf);
+
 signals:
 
 public slots:

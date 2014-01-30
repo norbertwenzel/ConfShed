@@ -4,6 +4,7 @@
 #include <exception>
 #include <stdexcept>
 #include <sstream>
+#include <vector>
 
 #include <QtGlobal>
 #include <QDebug>
@@ -22,9 +23,10 @@ const QString conf_scheduler::STORAGE_IDENTIFIER("data.db");
 conf_scheduler::conf_scheduler(QObject *parent) :
     QObject(parent),
     storage_(new detail::storage(get_existing_data_dir().filePath(STORAGE_IDENTIFIER))),
-    conferences_(nullptr)
+    conferences_(new conference_list_model(this))
 {
     assert(storage_);
+    assert(conferences_);
 }
 
 conf_scheduler::~conf_scheduler()
@@ -47,17 +49,19 @@ int conf_scheduler::get_num_conferences() const
     }
 }
 
-cfs::conference_list_model* conf_scheduler::get_all_conferences()
+cfs::conference_list_model* conf_scheduler::get_all_conferences() const
 {
+    assert(conferences_);
+
     //prefer cached list of conferences if available
-    if(conferences_)
+    if(conferences_->rowCount() > 0)
     {
         return conferences_;
     }
 
     try
     {
-        QList<cfs::conference*> all_confs;
+        std::vector<cfs::conference*> all_confs;
 
         assert(storage_);
         const auto &all_data = storage_->get_conferences();
@@ -74,15 +78,18 @@ cfs::conference_list_model* conf_scheduler::get_all_conferences()
 
         assert(all_confs.size() == get_num_conferences());
 
-        //TODO store in cache so get function with lazy init stays const
-        conferences_ = new cfs::conference_list_model(all_confs, const_cast<conf_scheduler*>(this));
+        //add all conferences to the list model
+        std::for_each(std::begin(all_confs), std::end(all_confs),
+        [&](cfs::conference *conf)
+        {
+            conferences_->add_conference(conf);
+        });
     }
     catch(const std::exception &e)
     {
         emit error(QString::fromLocal8Bit(e.what()));
     }
 
-    assert(conferences_);
     return conferences_;
 }
 
@@ -117,6 +124,9 @@ void conf_scheduler::unstar_event(const cfs::conference &conf, const cfs::event 
 void conf_scheduler::addConference(const QUrl &remote_conf_data_url)
 {
     qDebug() << remote_conf_data_url;
+
+    assert(conferences_);
+
     try
     {
         //compute a proper conference code
@@ -142,8 +152,7 @@ void conf_scheduler::addConference(const QUrl &remote_conf_data_url)
 
         //TODO use boost scope_guard to rollback in case of errors
 
-        auto conf = new conference(*data, this);
-        emit conferenceAdded(conf);
+        conferences_->add_conference(new conference(*data, this));
         return;
     }
     catch(const std::exception &e)

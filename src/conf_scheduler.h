@@ -33,7 +33,7 @@ public:
     ~conf_scheduler();
 
     Q_INVOKABLE int get_num_conferences() const;
-    Q_INVOKABLE cfs::conference_list_model* get_all_conferences();
+    Q_INVOKABLE cfs::conference_list_model* get_all_conferences() const;
 
     void star_event(const cfs::conference &conf, const cfs::event &evnt);
     void unstar_event(const cfs::conference &conf, const cfs::event &evnt);
