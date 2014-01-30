@@ -110,7 +110,8 @@ Page {
                MenuItem {
                    text: model.favorite ? "Remove favorite" : "Add favorite"
                    onClicked: {
-                       confDetailView.model.get(model.event_id).favorite = !confDetailView.model.get(model.event_id).favorite;
+                       //confDetailView.model.get(model.event_id).favorite = !confDetailView.model.get(model.event_id).favorite;
+                       confDetailView.model.make_item_favorite(index, !model.favorite);
                    }
                }
                MenuItem {
