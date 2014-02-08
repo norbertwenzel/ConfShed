@@ -50,7 +50,10 @@ public:
 
         db_ = QSqlDatabase::addDatabase(DB_DRIVER);
         db_.setDatabaseName(storage_identifier);
-        const auto res = db_.open();
+#ifndef NDEBUG
+        const auto res =
+#endif
+                db_.open();
         assert(res);
 
         create_db_if_necessary();
