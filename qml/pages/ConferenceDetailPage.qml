@@ -123,12 +123,7 @@ Page {
                         label: "Filter: "
                         currentIndex: 0
 
-                        menu: ContextMenu {
-                            MenuItem { text: "None" }
-                            MenuItem { text: "Track" }
-                            MenuItem { text: "Day" }
-                            MenuItem { text: "Upcoming" }
-                        }
+                        menu: null
 
                         onCurrentIndexChanged: {
                             applyFilterBtn.enabled = true;
@@ -153,10 +148,7 @@ Page {
                         enabled: filterSelection.currentIndex === 2
                         visible: enabled
 
-                        menu: ContextMenu{
-                            MenuItem { text: "Saturday" }
-                            MenuItem { text: "Sunday" }
-                        }
+                        menu: null
 
                         onCurrentIndexChanged: applyFilterBtn.enabled = true
                     }
@@ -168,52 +160,7 @@ Page {
                         enabled: filterSelection.currentIndex === 1
                         visible: enabled
 
-                        menu: ContextMenu{
-                            MenuItem { text: "Ada" }
-                            MenuItem { text: "Automotive development" }
-                            MenuItem { text: "BSD" }
-                            MenuItem { text: "Certification" }
-                            MenuItem { text: "Configuration management" }
-                            MenuItem { text: "Desktops" }
-                            MenuItem { text: "Distributions" }
-                            MenuItem { text: "Embedded" }
-                            MenuItem { text: "Energy-efficient computing" }
-                            MenuItem { text: "Game development" }
-                            MenuItem { text: "Go" }
-                            MenuItem { text: "Graph processing" }
-                            MenuItem { text: "Graphics" }
-                            MenuItem { text: "HPC and computational science" }
-                            MenuItem { text: "Hardware" }
-                            MenuItem { text: "IPv6" }
-                            MenuItem { text: "Internet of things" }
-                            MenuItem { text: "Java" }
-                            MenuItem { text: "JavaScript" }
-                            MenuItem { text: "Keynotes" }
-                            MenuItem { text: "LLVM" }
-                            MenuItem { text: "Legal and policy issues" }
-                            MenuItem { text: "Lightning talks" }
-                            MenuItem { text: "Mail" }
-                            MenuItem { text: "Mathematics" }
-                            MenuItem { text: "Memory and storage" }
-                            MenuItem { text: "Microkernel-based operating systems" }
-                            MenuItem { text: "Miscellaneous" }
-                            MenuItem { text: "Mozilla" }
-                            MenuItem { text: "MySQL" }
-                            MenuItem { text: "NoSQL" }
-                            MenuItem { text: "Open document editors" }
-                            MenuItem { text: "Perl" }
-                            MenuItem { text: "PostgreSQL" }
-                            MenuItem { text: "Python" }
-                            MenuItem { text: "Security" }
-                            MenuItem { text: "Smalltalk" }
-                            MenuItem { text: "Software defined radio" }
-                            MenuItem { text: "Testing and automation" }
-                            MenuItem { text: "Tracing and debugging" }
-                            MenuItem { text: "Valgrind" }
-                            MenuItem { text: "Virtualisation and IaaS" }
-                            MenuItem { text: "Wikis" }
-                            MenuItem { text: "Wine" }
-                        }
+                        menu: null
 
                         onCurrentIndexChanged: applyFilterBtn.enabled = true
                     }
