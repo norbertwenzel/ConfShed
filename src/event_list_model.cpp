@@ -193,14 +193,17 @@ void event_list_model::filter_by(event_list_model::filter_criteria criterion, QS
     }
     else if(criterion == FilterCurrentTime)
     {
+        const QDateTime FILTER_TIME = QDateTime::currentDateTime();
+                //QDateTime::fromString("2014-02-02 16:00:00", "yyyy-MM-dd HH:mm:ss");
+
         const auto it = std::stable_partition(std::begin(data_), std::end(data_),
-        [&](const cfs::event *evt){ return evt->starttime() > QDateTime::currentDateTime(); });
+        [&](const cfs::event *evt){ return evt->starttime() > FILTER_TIME; });
 
         new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
-        qDebug() << "Filtered" << new_size << "events with starttime >" << QDateTime::currentDateTime();
+        qDebug() << "Filtered" << new_size << "events with starttime >" << FILTER_TIME;
     }
 
-    changePersistentIndex(createIndex(0, 0), createIndex(rowCount() - 1, 0));
+    changePersistentIndex(createIndex(0, 0), createIndex(std::max(rowCount() - 1, 0), 0));
     emit layoutChanged();
 
     beginRemoveRows(QModelIndex(), new_size, data_.size());
