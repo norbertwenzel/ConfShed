@@ -230,6 +230,36 @@ QVariant event_list_model::headerData(int section, Qt::Orientation orientation, 
     }
 }
 
+QList<QString> event_list_model::getTracks() const
+{
+    //TODO: cache result instead of recomputing
+
+    QList<QString> tracks;
+    tracks.reserve(data_.size());
+    std::transform(std::begin(data_), std::end(data_), std::back_inserter(tracks),
+                   [](const cfs::event *evt){ return evt->track(); });
+    tracks = make_unique_set(std::move(tracks));
+
+    qDebug() << "Returned" << tracks.length() << "tracks.";
+
+    return tracks;
+}
+
+QList<QString> event_list_model::getRooms() const
+{
+    //TODO: cache result instead of recomputing
+
+    QList<QString> rooms;
+    rooms.reserve(data_.size());
+    std::transform(std::begin(data_), std::end(data_), std::back_inserter(rooms),
+                   [](const cfs::event *evt){ return evt->room(); });
+    rooms = make_unique_set(std::move(rooms));
+
+    qDebug() << "Returned" << rooms.length() << "rooms.";
+
+    return rooms;
+}
+
 bool event_list_model::make_item_favorite(int index, bool favorite)
 {
     qDebug() << index << favorite;
@@ -257,4 +287,14 @@ cfs::event* event_list_model::get(int id) const
 QString event_list_model::get_weekday(const cfs::event &evt) const
 {
     return evt.starttime().toString("dddd");
+}
+
+
+template<typename T>
+T event_list_model::make_unique_set(T&& data) const
+{
+    std::sort(std::begin(data), std::end(data));
+    data.erase(std::unique(std::begin(data), std::end(data)), std::end(data));
+
+    return data;
 }
