@@ -18,7 +18,7 @@ class event_list_model : public QAbstractListModel
 
     Q_PROPERTY(int length READ rowCount CONSTANT)
     Q_PROPERTY(QList<QString> tracks READ getTracks NOTIFY tracksChanged)
-    Q_PROPERTY(QList<QString> data READ getRooms NOTIFY roomsChanged)
+    Q_PROPERTY(QList<QString> rooms READ getRooms NOTIFY roomsChanged)
 
 public:
     enum sort_criteria { SortTitle, SortTrack, SortDay };
