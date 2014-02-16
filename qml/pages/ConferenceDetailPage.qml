@@ -28,22 +28,26 @@ Page {
         anchors.fill: parent
 
         PullDownMenu {
+            visible: confDetailView.count > 0 && conf !== null
+
             MenuItem {
                 text: "Update"
                 onClicked: conf.update(true, true)
             }
             MenuItem {
-                text: "Sort by day"
-                onClicked: {
+                text: "Sort by: day"
+                /*onClicked: {
                     confDetailView.model.sort_by(ConferenceEventList.SortDay);
                     confDetailView.section.property = 'weekday';
                     confDetailView.section.delegate = {
                         text: confDetailView.section
                     }
-                }
+                }*/
+                onClicked: pageStack.push(Qt.resolvedUrl("TextOptionDialogPage.qml"), { options : { "Tracks" : confDetailView.model.tracks,
+                                                                                                    "Rooms" : confDetailView.model.rooms }});
                 enabled: confDetailView.count > 0 && conf !== null
             }
-            MenuItem {
+            /*MenuItem {
                 text: "Sort by title"
                 onClicked: {
                     confDetailView.model.sort_by(ConferenceEventList.SortTitle)
@@ -66,6 +70,16 @@ Page {
                     }
                 }
                 enabled: confDetailView.count > 0 && conf !== null
+            }*/
+            MenuItem {
+                text: "Filter for: None"
+                onClicked: pageStack.push(Qt.resolvedUrl("TextOptionDialogPage.qml"), {  });
+            }
+            MenuItem {
+                text: "Upcoming events"
+                onClicked: {
+                    confDetailView.model.filter_by(ConferenceEventList.FilterCurrentTime, "");
+                }
             }
         }
 
