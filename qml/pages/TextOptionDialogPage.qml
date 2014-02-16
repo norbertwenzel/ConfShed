@@ -26,11 +26,19 @@ Dialog {
     function set_submenu_model(key) {
         if(key in __menus)
         {
-            textOptionView.model = __menus[key];
+            var menu = __menus[key];
+            clear_menu_selection(menu);
+            textOptionView.model = menu;
         }
         else
         {
             console.log("Invalid menu option " + key);
+        }
+    }
+
+    function clear_menu_selection(model) {
+        for(var i = 0; i < model.count; i++) {
+            model.setProperty(i, "selected", false);
         }
     }
 
@@ -40,11 +48,11 @@ Dialog {
             console.log(options[opt].length, options[opt]);
 
             //create a list model for every item
-            __menus[opt] = Qt.createQmlObject('import QtQuick 2.0; import Sailfish.Silica 1.0; ListModel {}',
+            __menus[opt] = Qt.createQmlObject('import QtQuick 2.0; import Sailfish.Silica 1.0; ListModel { }',
                                               page, opt + "ListModel");
             //fill the list model
             options[opt].forEach(function(entry) {
-                __menus[opt].append({"option": entry});
+                __menus[opt].append({"option": entry, "selected": false});
             });
         }
 
@@ -105,6 +113,13 @@ Dialog {
                 anchors.fill: parent
                 verticalAlignment: Text.AlignVCenter
                 text: model.option
+            }
+
+            width: parent.width
+            highlighted: model.selected
+            onClicked: {
+                textOptionView.model.setProperty(index, "selected", !model.selected);
+                highlighted = model.selected;
             }
         }
     }
