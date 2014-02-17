@@ -43,8 +43,21 @@ Page {
                         text: confDetailView.section
                     }
                 }*/
-                onClicked: pageStack.push(Qt.resolvedUrl("TextOptionDialogPage.qml"), { options : { "Tracks" : confDetailView.model.tracks,
-                                                                                                    "Rooms" : confDetailView.model.rooms }});
+                onClicked: {
+                    var dialog = pageStack.push(Qt.resolvedUrl("TextOptionDialogPage.qml"), { options : { "Tracks" : confDetailView.model.tracks,
+                                                                                                          "Rooms" : confDetailView.model.rooms }});
+                    dialog.accepted.connect(function() {
+                        if(dialog.filterType === "Tracks") {
+                            confDetailView.model.filter_by(ConferenceEventList.FilterTrack, dialog.filter);
+                        }
+                        else if(dialog.filterType === "Rooms") {
+                            confDetailView.model.filter_by(ConferenceEventList.FilterRoom, dialog.filter);
+                        }
+                        else {
+                            console.error("Unknown filter type '" + dialog.filterType + "'.");
+                        }
+                    });
+                }
                 enabled: confDetailView.count > 0 && conf !== null
             }
             /*MenuItem {

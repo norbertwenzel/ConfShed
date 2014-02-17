@@ -22,7 +22,7 @@ class event_list_model : public QAbstractListModel
 
 public:
     enum sort_criteria { SortTitle, SortTrack, SortDay };
-    enum filter_criteria { FilterNone, FilterTrack, FilterDay, FilterCurrentTime };
+    enum filter_criteria { FilterNone, FilterTrack, FilterDay, FilterRoom, FilterCurrentTime };
     explicit event_list_model(QObject *parent = nullptr);
     explicit event_list_model(std::vector<cfs::event*> list, QObject *parent = nullptr);
 

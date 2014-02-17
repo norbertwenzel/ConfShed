@@ -5,6 +5,7 @@
 #include <iterator>
 
 #include <QDebug>
+#include <QStringList>
 
 using cfs::event_list_model;
 
@@ -172,24 +173,43 @@ void event_list_model::filter_by(event_list_model::filter_criteria criterion, QS
     assert(criterion != FilterNone);
     filter_ = std::move(the_filter);
 
+    const auto filterItems = filter_.split("|");
+    const auto compare_any = [](const QStringList &list, const QString &term)
+    {
+        const auto it = std::find_if(std::begin(list), std::end(list),
+                                     [&](const QString &item)
+                                     {
+                                        return QString::compare(term, item, Qt::CaseInsensitive) == 0;
+                                     });
+        return it != std::end(list); //true if one item matches
+    };
+
     emit layoutAboutToBeChanged();
 
     int new_size = -1;
     if(criterion == FilterTrack)
     {
         const auto it = std::stable_partition(std::begin(data_), std::end(data_),
-        [&](const cfs::event *evt){ return QString::compare(evt->track(), filter_, Qt::CaseInsensitive) == 0; });
+                        [&](const cfs::event *evt){ return compare_any(filterItems, evt->track()); });
 
         new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
-        qDebug() << "Filtered" << new_size << "events for track" << filter_;
+        qDebug() << "Filtered" << new_size << "events for track(s)" << filter_;
     }
     else if(criterion == FilterDay)
     {
         const auto it = std::stable_partition(std::begin(data_), std::end(data_),
-        [&](const cfs::event *evt){ return QString::compare(get_weekday(*evt), filter_, Qt::CaseInsensitive) == 0; });
+                        [&](const cfs::event *evt){ return compare_any(filterItems, get_weekday(*evt)); });
 
         new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
-        qDebug() << "Filtered" << new_size << "events for day" << filter_;
+        qDebug() << "Filtered" << new_size << "events for day(s)" << filter_;
+    }
+    else if(criterion == FilterRoom)
+    {
+        const auto it = std::stable_partition(std::begin(data_), std::end(data_),
+                        [&](const cfs::event *evt){ return compare_any(filterItems, evt->room()); });
+
+        new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
+        qDebug() << "Filtered" << new_size << "events for room(s)" << filter_;
     }
     else if(criterion == FilterCurrentTime)
     {
