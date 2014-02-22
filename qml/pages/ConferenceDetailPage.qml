@@ -50,7 +50,8 @@ Page {
                 }*/
                 onClicked: {
                     var dialog = pageStack.push(Qt.resolvedUrl("TextOptionDialogPage.qml"), { options : { "Tracks" : confDetailView.model.tracks,
-                                                                                                          "Rooms" : confDetailView.model.rooms }});
+                                                                                                          "Rooms" : confDetailView.model.rooms,
+                                                                                                          "Days" : confDetailView.model.days }});
                     dialog.accepted.connect(function() {
                         if(dialog.filterType === "Tracks") {
                             confDetailView.model.filter_by(ConferenceEventList.FilterTrack, dialog.filter);
@@ -59,6 +60,10 @@ Page {
                         else if(dialog.filterType === "Rooms") {
                             confDetailView.model.filter_by(ConferenceEventList.FilterRoom, dialog.filter);
                             sort_events(ConferenceEventList.SortRoom);
+                        }
+                        else if(dialog.filterType === "Days") {
+                            confDetailView.model.filter_by(ConferenceEventList.FilterDay, dialog.filter);
+                            sort_events(ConferenceEventList.SortDay);
                         }
                         else {
                             console.error("Unknown filter type '" + dialog.filterType + "'.");

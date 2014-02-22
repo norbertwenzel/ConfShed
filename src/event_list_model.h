@@ -19,6 +19,7 @@ class event_list_model : public QAbstractListModel
     Q_PROPERTY(int length READ rowCount CONSTANT)
     Q_PROPERTY(QList<QString> tracks READ getTracks NOTIFY tracksChanged)
     Q_PROPERTY(QList<QString> rooms READ getRooms NOTIFY roomsChanged)
+    Q_PROPERTY(QList<QString> days READ getDays NOTIFY daysChanged)
 
 public:
     enum sort_criteria { SortTitle, SortTrack, SortDay, SortRoom };
@@ -33,6 +34,7 @@ public:
 
     QList<QString> getTracks() const;
     QList<QString> getRooms() const;
+    QList<QString> getDays() const;
 
     Q_INVOKABLE bool make_item_favorite(int index, bool favorite);
 
@@ -44,6 +46,7 @@ public:
 signals:
     void tracksChanged() const;
     void roomsChanged() const;
+    void daysChanged() const;
 
 public slots:
 

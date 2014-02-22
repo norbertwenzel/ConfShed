@@ -361,6 +361,22 @@ QList<QString> event_list_model::getRooms() const
     return rooms;
 }
 
+QList<QString> event_list_model::getDays() const
+{
+    //TODO: cache result instead of recomputing
+    //BUG: atm conferences longer than one week return just 7 days
+
+    QList<QString> days;
+    days.reserve(data_.size());
+    std::transform(std::begin(data_), std::end(data_), std::back_inserter(days),
+                   [&](const cfs::event *evt){ return get_weekday(*evt); });
+    days = make_unique_set(std::move(days));
+
+    qDebug() << "Returned" << days.length() << "days.";
+
+    return days;
+}
+
 bool event_list_model::make_item_favorite(int index, bool favorite)
 {
     qDebug() << index << favorite;
