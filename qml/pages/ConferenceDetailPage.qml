@@ -55,7 +55,9 @@ Page {
                         }
                         else {
                             console.error("Unknown filter type '" + dialog.filterType + "'.");
+                            return; //we did not filter, so we do not need to enable clearing the filter
                         }
+                        clearFilterMenu.enabled = true;
                     });
                 }
                 enabled: confDetailView.count > 0 && conf !== null
@@ -93,6 +95,15 @@ Page {
                 onClicked: {
                     confDetailView.model.filter_by(ConferenceEventList.FilterCurrentTime, "");
                 }
+            }
+            MenuItem {
+                id: clearFilterMenu
+                text: "Clear filters"
+                onClicked: {
+                    confDetailView.model.filter_by(ConferenceEventList.FilterNone, "");
+                    enabled = false;
+                }
+                enabled: false
             }
         }
 
