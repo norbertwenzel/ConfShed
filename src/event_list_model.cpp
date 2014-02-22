@@ -131,7 +131,18 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
 
     emit layoutAboutToBeChanged();
 
-    std::sort(std::begin(*this), std::end(*this),
+    //make sure, that all events are in order of their starttime
+    //SortDay already sorts by starttime, so no need to sort twice
+    if(criterion != SortDay)
+    {
+        std::sort(std::begin(*this), std::end(*this),
+        [](const cfs::event *e1, const cfs::event *e2)
+        {
+            return e1->starttime() < e2->starttime();
+        });
+    }
+
+    std::stable_sort(std::begin(*this), std::end(*this),
     [=](const cfs::event *e1, const cfs::event *e2) -> bool
     {
         if(criterion == SortTitle)
