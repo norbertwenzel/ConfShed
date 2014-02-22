@@ -386,7 +386,7 @@ QDir conf_scheduler::get_existing_data_dir()
                "and can not be created.";
         //TODO: maybe calling emit from a ctor is not the best idea
         //emit error(QString::fromLocal8Bit(msg.str().c_str()));
-        qFatal(msg.str().c_str());
+        qFatal("%s", msg.str().c_str());
         exit(1);
     }
 
