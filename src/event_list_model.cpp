@@ -188,6 +188,12 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
     changePersistentIndex(createIndex(0, 0), createIndex(rowCount() - 1, 0));
 
 #ifndef NDEBUG
+    //print all the items, for easier debugging
+    for(const auto &e : *this)
+    {
+        qDebug() << e->starttime() << e->title() << e->track();
+    }
+
     //make sure the items are all the same, but only in a possibly different order
     assert(old_items.size() == rowCount());
     std::sort(std::begin(old_items), std::end(old_items));
@@ -210,6 +216,7 @@ void event_list_model::filter_by(event_list_model::filter_criteria criterion, QS
         filter_.clear();
         beginInsertRows(QModelIndex(), rowCount(), data_.size() - rowCount());
         filtered_size_ = -1;
+        assert(rowCount() == data_.size());
         emit endInsertRows();
 
         return;
@@ -276,6 +283,20 @@ void event_list_model::filter_by(event_list_model::filter_criteria criterion, QS
     filtered_size_ = new_size;
 
     emit endRemoveRows();
+
+#ifndef NDEBUG
+    //check filtered data
+    decltype(data_) filtered_test_data;
+    filtered_test_data.reserve(rowCount());
+    std::copy(std::begin(*this), std::end(*this), std::back_inserter(filtered_test_data));
+    filtered_test_data = make_unique_set(std::move(filtered_test_data));
+    assert(filtered_test_data.size() == rowCount()); //no item should occur twice in our list
+
+    //check full/unfiltered data
+    decltype(data_) full_test_data(data_);
+    full_test_data = make_unique_set(std::move(full_test_data));
+    assert(filtered_test_data.size() == rowCount()); //no item should occur twice in our list
+#endif
 }
 
 QVariant event_list_model::headerData(int section, Qt::Orientation orientation, int role) const
