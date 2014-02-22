@@ -4,8 +4,12 @@
 #include <algorithm>
 #include <iterator>
 
+#include <resolv.h>
+#include <boost/utility.hpp>
+
 #include <QDebug>
 #include <QStringList>
+#include <QMetaEnum>
 
 using cfs::event_list_model;
 
@@ -105,11 +109,29 @@ QVariant event_list_model::data(const QModelIndex &index, int role) const
 void event_list_model::sort_by(event_list_model::sort_criteria criterion,
                                Qt::SortOrder order /* = Qt::AscendingOrder */)
 {
-    qDebug();
+#ifndef NDEBUG
+    const auto &mo = event_list_model::staticMetaObject;
+    const auto &me = mo.enumerator(mo.indexOfEnumerator("sort_criteria"));
+#endif
+
+    qDebug() << "criterion =" <<
+#ifndef NDEBUG
+                me.valueToKey(criterion) <<
+#else
+                criterion <<
+#endif
+                "order =" << order;
+
+#ifndef NDEBUG
+    decltype(data_) old_items;
+    old_items.reserve(rowCount());
+    std::copy(std::begin(*this), std::end(*this), std::back_inserter(old_items));
+    assert(old_items.size() == rowCount());
+#endif
 
     emit layoutAboutToBeChanged();
 
-    std::sort(std::begin(data_), std::end(data_),
+    std::sort(std::begin(*this), std::end(*this),
     [=](const cfs::event *e1, const cfs::event *e2) -> bool
     {
         if(criterion == SortTitle)
@@ -153,6 +175,18 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
     });
 
     changePersistentIndex(createIndex(0, 0), createIndex(rowCount() - 1, 0));
+
+#ifndef NDEBUG
+    //make sure the items are all the same, but only in a possibly different order
+    assert(old_items.size() == rowCount());
+    std::sort(std::begin(old_items), std::end(old_items));
+    std::for_each(std::begin(*this), std::end(*this),
+        [&](const cfs::event* ev)
+        {
+            assert(std::binary_search(std::begin(old_items), std::end(old_items), ev));
+        });
+#endif
+
     emit layoutChanged();
 }
 
@@ -309,7 +343,6 @@ QString event_list_model::get_weekday(const cfs::event &evt) const
     return evt.starttime().toString("dddd");
 }
 
-
 template<typename T>
 T event_list_model::make_unique_set(T&& data) const
 {
@@ -317,4 +350,34 @@ T event_list_model::make_unique_set(T&& data) const
     data.erase(std::unique(std::begin(data), std::end(data)), std::end(data));
 
     return data;
+}
+
+event_list_model::iterator event_list_model::begin()
+{
+    return std::begin(data_);
+}
+
+event_list_model::iterator event_list_model::end()
+{
+    return boost::next(std::begin(data_), rowCount());
+}
+
+event_list_model::const_iterator event_list_model::begin() const
+{
+    return cbegin();
+}
+
+event_list_model::const_iterator event_list_model::end() const
+{
+    return cend();
+}
+
+event_list_model::const_iterator event_list_model::cbegin() const
+{
+    return std::begin(data_);
+}
+
+event_list_model::const_iterator event_list_model::cend() const
+{
+    return boost::next(std::begin(data_), rowCount());
 }

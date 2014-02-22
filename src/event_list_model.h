@@ -73,6 +73,17 @@ private:
     std::vector<cfs::event*> data_;
     int filtered_size_;
     QString filter_;
+
+public: //iterator definitions
+    typedef std::vector<cfs::event*>::iterator iterator;
+    typedef std::vector<cfs::event*>::const_iterator const_iterator;
+
+    iterator begin();
+    iterator end();
+    const_iterator begin() const;
+    const_iterator end() const;
+    const_iterator cbegin() const;
+    const_iterator cend() const;
 };
 
 } //namespace cfs
