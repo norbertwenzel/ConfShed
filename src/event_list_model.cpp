@@ -147,26 +147,28 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
     {
         if(criterion == SortTitle)
         {
+            const auto &result = QString::compare(e1->title(), e2->title(), Qt::CaseInsensitive);
             if(order == Qt::AscendingOrder)
             {
-                return e1->title() < e2->title();
+                return result < 0;
             }
             else
             {
                 assert(order == Qt::DescendingOrder);
-                return e1->title() > e2->title();
+                return result > 0;
             }
         }
         else if(criterion == SortTrack)
         {
+            const auto &result = QString::compare(e1->track(), e2->track(), Qt::CaseInsensitive);
             if(order == Qt::AscendingOrder)
             {
-                return e1->track() < e2->track();
+                return result < 0;
             }
             else
             {
                 assert(order == Qt::DescendingOrder);
-                return e1->track() > e2->track();
+                return result > 0;
             }
         }
         else if(criterion == SortDay)
