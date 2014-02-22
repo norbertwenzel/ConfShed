@@ -6,6 +6,8 @@
 #include <sstream>
 #include <vector>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <QtGlobal>
 #include <QDebug>
 #include <QStandardPaths>
@@ -76,7 +78,7 @@ cfs::conference_list_model* conf_scheduler::get_all_conferences() const
             return new conference(d, parent_ptr);
         });
 
-        assert(all_confs.size() == get_num_conferences());
+        assert(all_confs.size() == boost::numeric_cast<decltype(all_confs.size())>(get_num_conferences()));
 
         //add all conferences to the list model
         std::for_each(std::begin(all_confs), std::end(all_confs),
