@@ -21,7 +21,7 @@ class event_list_model : public QAbstractListModel
     Q_PROPERTY(QList<QString> rooms READ getRooms NOTIFY roomsChanged)
 
 public:
-    enum sort_criteria { SortTitle, SortTrack, SortDay };
+    enum sort_criteria { SortTitle, SortTrack, SortDay, SortRoom };
     enum filter_criteria { FilterNone, FilterTrack, FilterDay, FilterRoom, FilterCurrentTime };
     explicit event_list_model(QObject *parent = nullptr);
     explicit event_list_model(std::vector<cfs::event*> list, QObject *parent = nullptr);

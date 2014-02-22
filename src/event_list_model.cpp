@@ -183,6 +183,19 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
                 return e1->starttime() > e2->starttime();
             }
         }
+        else if(criterion == SortRoom)
+        {
+            const auto &result = QString::compare(e1->room(), e2->room(), Qt::CaseInsensitive);
+            if(order == Qt::AscendingOrder)
+            {
+                return result < 0;
+            }
+            else
+            {
+                assert(order == Qt::DescendingOrder);
+                return result > 0;
+            }
+        }
         assert(false);
         return false;
     });
