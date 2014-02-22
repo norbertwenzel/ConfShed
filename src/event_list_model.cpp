@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <iterator>
 
-#include <resolv.h>
 #include <boost/utility.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <QDebug>
 #include <QStringList>
@@ -126,7 +126,7 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
     decltype(data_) old_items;
     old_items.reserve(rowCount());
     std::copy(std::begin(*this), std::end(*this), std::back_inserter(old_items));
-    assert(old_items.size() == rowCount());
+    assert(old_items.size() == boost::numeric_cast<decltype(old_items.size())>(rowCount()));
 #endif
 
     emit layoutAboutToBeChanged();
@@ -210,7 +210,7 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
     }
 
     //make sure the items are all the same, but only in a possibly different order
-    assert(old_items.size() == rowCount());
+    assert(old_items.size() == boost::numeric_cast<decltype(old_items.size())>(rowCount()));
     std::sort(std::begin(old_items), std::end(old_items));
     std::for_each(std::begin(*this), std::end(*this),
         [&](const cfs::event* ev)
@@ -231,7 +231,7 @@ void event_list_model::filter_by(event_list_model::filter_criteria criterion, QS
         filter_.clear();
         beginInsertRows(QModelIndex(), rowCount(), data_.size() - rowCount());
         filtered_size_ = -1;
-        assert(rowCount() == data_.size());
+        assert(rowCount() == boost::numeric_cast<decltype(rowCount())>(data_.size()));
         emit endInsertRows();
 
         return;
@@ -305,12 +305,12 @@ void event_list_model::filter_by(event_list_model::filter_criteria criterion, QS
     filtered_test_data.reserve(rowCount());
     std::copy(std::begin(*this), std::end(*this), std::back_inserter(filtered_test_data));
     filtered_test_data = make_unique_set(std::move(filtered_test_data));
-    assert(filtered_test_data.size() == rowCount()); //no item should occur twice in our list
+    assert(filtered_test_data.size() == boost::numeric_cast<decltype(filtered_test_data.size())>(rowCount())); //no item should occur twice in our list
 
     //check full/unfiltered data
     decltype(data_) full_test_data(data_);
     full_test_data = make_unique_set(std::move(full_test_data));
-    assert(filtered_test_data.size() == rowCount()); //no item should occur twice in our list
+    assert(full_test_data.size() == data_.size()); //no item should occur twice in our list
 #endif
 }
 
