@@ -7,6 +7,11 @@ Page {
 
     property Conference conf: null
 
+    function sort_events(criterion) {
+        console.log("sort_events(" + criterion + ")");
+        confDetailView.model.sort_by(criterion);
+    }
+
     function show_event_list() {
         console.log("show_event_list()");
         if(conf != null) {
@@ -49,9 +54,11 @@ Page {
                     dialog.accepted.connect(function() {
                         if(dialog.filterType === "Tracks") {
                             confDetailView.model.filter_by(ConferenceEventList.FilterTrack, dialog.filter);
+                            sort_events(ConferenceEventList.SortTrack);
                         }
                         else if(dialog.filterType === "Rooms") {
                             confDetailView.model.filter_by(ConferenceEventList.FilterRoom, dialog.filter);
+                            sort_events(ConferenceEventList.SortRoom);
                         }
                         else {
                             console.error("Unknown filter type '" + dialog.filterType + "'.");
