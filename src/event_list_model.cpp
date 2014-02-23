@@ -339,6 +339,11 @@ QVariant event_list_model::headerData(int section, Qt::Orientation orientation, 
     }
 }
 
+int event_list_model::dataCount() const
+{
+    return boost::numeric_cast<int>(data_.size());
+}
+
 QList<QString> event_list_model::getTracks() const
 {
     //TODO: cache result instead of recomputing

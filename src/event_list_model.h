@@ -17,6 +17,7 @@ class event_list_model : public QAbstractListModel
     Q_ENUMS(filter_criteria)
 
     Q_PROPERTY(int length READ rowCount CONSTANT)
+    Q_PROPERTY(int unfilteredLength READ dataCount CONSTANT)
     Q_PROPERTY(QList<QString> tracks READ getTracks NOTIFY tracksChanged)
     Q_PROPERTY(QList<QString> rooms READ getRooms NOTIFY roomsChanged)
     Q_PROPERTY(QList<QString> days READ getDays NOTIFY daysChanged)
@@ -32,6 +33,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
+    int dataCount() const;
     QList<QString> getTracks() const;
     QList<QString> getRooms() const;
     QList<QString> getDays() const;

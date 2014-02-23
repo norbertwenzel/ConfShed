@@ -33,7 +33,7 @@ Page {
         anchors.fill: parent
 
         PullDownMenu {
-            visible: confDetailView.count > 0 && conf !== null
+            visible: (confDetailView.count > 0 || (confDetailView.model !== null && confDetailView.model.unfilteredLength > 0)) && conf !== null
 
             MenuItem {
                 text: "Update"
@@ -105,14 +105,22 @@ Page {
             MenuItem {
                 text: "Upcoming events"
                 onClicked: {
-                    confDetailView.model.filter_by(ConferenceEventList.FilterCurrentTime, "");
+                    confDetailView.model.filter_by(ConferenceEventList.FilterCurrentTime);
+                    clearFilterMenu.enabled = true;
+                }
+            }
+            MenuItem {
+                text: "Favorites"
+                onClicked: {
+                    confDetailView.model.filter_by(ConferenceEventList.FilterFavorite);
+                    clearFilterMenu.enabled = true;
                 }
             }
             MenuItem {
                 id: clearFilterMenu
                 text: "Clear filters"
                 onClicked: {
-                    confDetailView.model.filter_by(ConferenceEventList.FilterNone, "");
+                    confDetailView.model.filter_by(ConferenceEventList.FilterNone);
                     enabled = false;
                 }
                 enabled: false
