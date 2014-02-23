@@ -222,7 +222,7 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
     emit layoutChanged();
 }
 
-void event_list_model::filter_by(event_list_model::filter_criteria criterion, QString the_filter)
+void event_list_model::filter_by(event_list_model::filter_criteria criterion, QString the_filter /* = QString() */)
 {
     qDebug() << criterion << the_filter;
 
@@ -288,6 +288,14 @@ void event_list_model::filter_by(event_list_model::filter_criteria criterion, QS
 
         new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
         qDebug() << "Filtered" << new_size << "events with starttime >" << FILTER_TIME;
+    }
+    else if(criterion == FilterFavorite)
+    {
+        const auto it = std::stable_partition(std::begin(data_), std::end(data_),
+                        [](const cfs::event *evt) { return evt->favorite(); });
+
+        new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
+        qDebug() << "Filtered" << new_size << "favorite events";
     }
 
     changePersistentIndex(createIndex(0, 0), createIndex(std::max(rowCount() - 1, 0), 0));

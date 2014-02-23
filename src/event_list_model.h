@@ -23,7 +23,7 @@ class event_list_model : public QAbstractListModel
 
 public:
     enum sort_criteria { SortTitle, SortTrack, SortDay, SortRoom };
-    enum filter_criteria { FilterNone, FilterTrack, FilterDay, FilterRoom, FilterCurrentTime };
+    enum filter_criteria { FilterNone, FilterTrack, FilterDay, FilterRoom, FilterCurrentTime, FilterFavorite };
     explicit event_list_model(QObject *parent = nullptr);
     explicit event_list_model(std::vector<cfs::event*> list, QObject *parent = nullptr);
 
@@ -39,7 +39,7 @@ public:
     Q_INVOKABLE bool make_item_favorite(int index, bool favorite);
 
     Q_INVOKABLE void sort_by(sort_criteria criterion, Qt::SortOrder order = Qt::AscendingOrder);
-    Q_INVOKABLE void filter_by(filter_criteria criterion, QString the_filter);
+    Q_INVOKABLE void filter_by(filter_criteria criterion, QString the_filter = QString());
 
     Q_INVOKABLE cfs::event* get(int id) const;
 
