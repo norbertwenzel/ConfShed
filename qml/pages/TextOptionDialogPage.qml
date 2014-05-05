@@ -6,9 +6,9 @@ Dialog {
     id: page
 
     property var options: ({})
-    property string filterType: ""
-    property string filter: ""
-    property string comboText: "Filter for"
+    property string mainSelection: ""
+    property string subSelection: ""
+    property string comboLabel: "Filter for"
 
     property int __defaultIndex: 0
     property var __menus: ({})
@@ -20,7 +20,7 @@ Dialog {
         if(selected_key.length > 0)
         {
             textOptionView.model = __menus[selected_key[__defaultIndex]];
-            filterType = selected_key[__defaultIndex];
+            mainSelection = selected_key[__defaultIndex];
         }
         else
         {
@@ -34,7 +34,7 @@ Dialog {
             var menu = __menus[key];
             clear_menu_selection(menu);
             textOptionView.model = menu;
-            filterType = key;
+            mainSelection = key;
         }
         else
         {
@@ -55,7 +55,7 @@ Dialog {
     }
 
     //create an array of menu options for the main menu combo box
-    function get_main_menu_options() {
+    function get_main_selections() {
         return is_multilevel() ? Object.keys(options) : options;
     }
 
@@ -89,19 +89,19 @@ Dialog {
                 for(var i = 0; i < textOptionView.model.count; i++) {
                     if(textOptionView.model.get(i).selected)
                     {
-                        if(filter.length > 0) {
-                            filter += "|";
+                        if(subSelection.length > 0) {
+                            subSelection += "|";
                         }
 
-                        filter += textOptionView.model.get(i).option;
+                        subSelection += textOptionView.model.get(i).option;
                     }
                 }
 
-                console.log("Filtering '" + filterType + "': " + filter);
+                console.log("Filtering '" + mainSelection + "': " + subSelection);
             }
             else
             {
-                console.log("Chose: " + filter);
+                console.log("Chose: " + mainSelection);
             }
         }
     }
@@ -128,7 +128,7 @@ Dialog {
             ComboBox {
                 id: mainMenu
                 width: parent.width
-                label: comboText
+                label: comboLabel
                 currentIndex: __defaultIndex
                 onCurrentIndexChanged: {
                     if(is_multilevel())
@@ -137,7 +137,7 @@ Dialog {
                     }
                     else
                     {
-                        filter = options[currentIndex];
+                        mainSelection = options[currentIndex];
                     }
                 }
 
@@ -145,7 +145,7 @@ Dialog {
                     Repeater {
                         id: mainMenuRepeater
                         //use the array of keys as main menu options
-                        model: options != null ? get_main_menu_options()  : null;
+                        model: options != null ? get_main_selections()  : null;
                         MenuItem { text: modelData }
                     }
                 }

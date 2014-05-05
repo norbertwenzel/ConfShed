@@ -39,68 +39,44 @@ Page {
                 text: "Update"
                 onClicked: conf.update(true, true)
             }
+
             MenuItem {
-                text: "Sort by: day"
-                /*onClicked: {
-                    confDetailView.model.sort_by(ConferenceEventList.SortDay);
-                    confDetailView.section.property = 'weekday';
-                    confDetailView.section.delegate = {
-                        text: confDetailView.section
-                    }
-                }*/
+                text: "Filter for: None"
                 onClicked: {
                     var dialog = pageStack.push(Qt.resolvedUrl("TextOptionDialogPage.qml"), { options : { "Tracks" : confDetailView.model.tracks,
                                                                                                           "Rooms" : confDetailView.model.rooms,
-                                                                                                          "Days" : confDetailView.model.days }});
+                                                                                                          "Days" : confDetailView.model.days },
+                                                                                              comboLabel : "Filter for"});
                     dialog.accepted.connect(function() {
-                        if(dialog.filterType === "Tracks") {
-                            confDetailView.model.filter_by(ConferenceEventList.FilterTrack, dialog.filter);
+                        if(dialog.mainSelection === "Tracks") {
+                            confDetailView.model.filter_by(ConferenceEventList.FilterTrack, dialog.subSelection);
                             sort_events(ConferenceEventList.SortTrack);
                         }
-                        else if(dialog.filterType === "Rooms") {
-                            confDetailView.model.filter_by(ConferenceEventList.FilterRoom, dialog.filter);
+                        else if(dialog.mainSelection === "Rooms") {
+                            confDetailView.model.filter_by(ConferenceEventList.FilterRoom, dialog.subSelection);
                             sort_events(ConferenceEventList.SortRoom);
                         }
-                        else if(dialog.filterType === "Days") {
-                            confDetailView.model.filter_by(ConferenceEventList.FilterDay, dialog.filter);
+                        else if(dialog.mainSelection === "Days") {
+                            confDetailView.model.filter_by(ConferenceEventList.FilterDay, dialog.subSelection);
                             sort_events(ConferenceEventList.SortDay);
                         }
                         else {
-                            console.error("Unknown filter type '" + dialog.filterType + "'.");
-                            return; //we did not filter, so we do not need to enable clearing the filter
+                            console.error("Unknown subSelection type '" + dialog.mainSelection + "'.");
+                            return; //we did not subSelection, so we do not need to enable clearing the subSelection
                         }
+                        text = "Filter for: " + dialog.mainSelection;
                         clearFilterMenu.enabled = true;
                     });
                 }
                 enabled: confDetailView.count > 0 && conf !== null
             }
-            /*MenuItem {
-                text: "Sort by title"
+            MenuItem {
+                text: "Sort by: None"
                 onClicked: {
-                    confDetailView.model.sort_by(ConferenceEventList.SortTitle)
-                    confDetailView.section.property = 'title';
-                    confDetailView.section.criteria = ViewSection.FirstCharacter;
-                    confDetailView.section.delegate = {
-                        text: confDetailView.section.slice(0, 1)
-                    }
+                    var dialog = pageStack.push(Qt.resolvedUrl("TextOptionDialogPage.qml"), { options : [ "Title", "Track", "Day", "Room" ],
+                                                                                              comboLabel : "Sort by"});
                 }
                 enabled: confDetailView.count > 0 && conf !== null
-            }
-            MenuItem {
-                text: "Sort by track"
-                onClicked: {
-                    confDetailView.model.sort_by(ConferenceEventList.SortTrack)
-                    confDetailView.section.property = 'track'
-                    confDetailView.section.criteria = ViewSection.FullString
-                    confDetailView.section.delegate = {
-                        text: confDetailView.section
-                    }
-                }
-                enabled: confDetailView.count > 0 && conf !== null
-            }*/
-            MenuItem {
-                text: "Filter for: None"
-                onClicked: pageStack.push(Qt.resolvedUrl("TextOptionDialogPage.qml"), {  });
             }
             MenuItem {
                 text: "Upcoming events"
@@ -108,6 +84,7 @@ Page {
                     confDetailView.model.filter_by(ConferenceEventList.FilterCurrentTime);
                     clearFilterMenu.enabled = true;
                 }
+                enabled: confDetailView.count > 0 && conf !== null
             }
             MenuItem {
                 text: "Favorites"
@@ -115,6 +92,7 @@ Page {
                     confDetailView.model.filter_by(ConferenceEventList.FilterFavorite);
                     clearFilterMenu.enabled = true;
                 }
+                enabled: confDetailView.count > 0 && conf !== null
             }
             MenuItem {
                 id: clearFilterMenu
