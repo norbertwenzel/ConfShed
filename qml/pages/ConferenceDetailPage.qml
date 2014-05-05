@@ -7,9 +7,13 @@ Page {
 
     property Conference conf: null
 
-    function sort_events(criterion) {
-        console.log("sort_events(" + criterion + ")");
+    function sort_events(criterion, text) {
+        console.log("sort_events(" + (text ? text : criterion) + ")");
         confDetailView.model.sort_by(criterion);
+        if(text)
+        {
+            sortMenuEntry.text = "Sort by: " + text;
+        }
     }
 
     function show_event_list() {
@@ -50,19 +54,19 @@ Page {
                     dialog.accepted.connect(function() {
                         if(dialog.mainSelection === "Tracks") {
                             confDetailView.model.filter_by(ConferenceEventList.FilterTrack, dialog.subSelection);
-                            sort_events(ConferenceEventList.SortTrack);
+                            sort_events(ConferenceEventList.SortTrack, dialog.mainSelection);
                         }
                         else if(dialog.mainSelection === "Rooms") {
                             confDetailView.model.filter_by(ConferenceEventList.FilterRoom, dialog.subSelection);
-                            sort_events(ConferenceEventList.SortRoom);
+                            sort_events(ConferenceEventList.SortRoom, dialog.mainSelection);
                         }
                         else if(dialog.mainSelection === "Days") {
                             confDetailView.model.filter_by(ConferenceEventList.FilterDay, dialog.subSelection);
-                            sort_events(ConferenceEventList.SortDay);
+                            sort_events(ConferenceEventList.SortDay, dialog.mainSelection);
                         }
                         else {
-                            console.error("Unknown subSelection type '" + dialog.mainSelection + "'.");
-                            return; //we did not subSelection, so we do not need to enable clearing the subSelection
+                            console.error("Unknown selection type '" + dialog.mainSelection + "'.");
+                            return; //we did not filter, so we do not need to enable clearing the subSelection
                         }
                         text = "Filter for: " + dialog.mainSelection;
                         clearFilterMenu.enabled = true;
@@ -71,10 +75,28 @@ Page {
                 enabled: confDetailView.count > 0 && conf !== null
             }
             MenuItem {
+                id: sortMenuEntry
                 text: "Sort by: None"
                 onClicked: {
-                    var dialog = pageStack.push(Qt.resolvedUrl("TextOptionDialogPage.qml"), { options : [ "Title", "Track", "Day", "Room" ],
+                    var dialog = pageStack.push(Qt.resolvedUrl("TextOptionDialogPage.qml"), { options : [ "Titles", "Tracks", "Days", "Rooms" ],
                                                                                               comboLabel : "Sort by"});
+                    dialog.accepted.connect(function() {
+                        if(dialog.mainSelection === "Titles") {
+                            sort_events(ConferenceEventList.SortTitle, dialog.mainSelection);
+                        }
+                        else if(dialog.mainSelection === "Tracks") {
+                            sort_events(ConferenceEventList.SortTrack, dialog.mainSelection);
+                        }
+                        else if(dialog.mainSelection === "Rooms") {
+                            sort_events(ConferenceEventList.SortRoom, dialog.mainSelection);
+                        }
+                        else if(dialog.mainSelection === "Days") {
+                            sort_events(ConferenceEventList.SortDay, dialog.mainSelection);
+                        }
+                        else {
+                            console.error("Unknown selection type '" + dialog.mainSelection + "'.");
+                        }
+                    });
                 }
                 enabled: confDetailView.count > 0 && conf !== null
             }
