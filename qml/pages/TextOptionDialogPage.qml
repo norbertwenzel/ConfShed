@@ -48,39 +48,60 @@ Dialog {
         __selectedCnt = 0;
     }
 
-    Component.onCompleted: {
-        for(var opt in options) {
-            console.log(opt + ":");
-            console.log(options[opt].length, options[opt]);
-
-            //create a list model for every item
-            __menus[opt] = Qt.createQmlObject('import QtQuick 2.0; import Sailfish.Silica 1.0; ListModel { }',
-                                              page, opt + "ListModel");
-            //fill the list model
-            options[opt].forEach(function(entry) {
-                __menus[opt].append({"option": entry, "selected": false});
-            });
-        }
-
-        init_submenu_model();
+    //check whether there are is a multilevel selection or only a single combo box
+    function is_multilevel() {
+        return !("length" in options);
     }
 
-    canAccept: __selectedCnt > 0
+    //create an array of menu options for the main menu combo box
+    function get_main_menu_options() {
+        return is_multilevel() ? Object.keys(options) : options;
+    }
+
+    Component.onCompleted: {
+        console.log("multilevel dialog = " + is_multilevel());
+        if(is_multilevel())
+        {
+            for(var opt in options) {
+                console.log(opt + ":");
+                console.log(options[opt].length, options[opt]);
+
+                //create a list model for every item
+                __menus[opt] = Qt.createQmlObject('import QtQuick 2.0; import Sailfish.Silica 1.0; ListModel { }',
+                                                  page, opt + "ListModel");
+                //fill the list model
+                options[opt].forEach(function(entry) {
+                    __menus[opt].append({"option": entry, "selected": false});
+                });
+            }
+
+            init_submenu_model();
+        }
+    }
+
+    canAccept: __selectedCnt > 0 || !is_multilevel()
     onDone: {
         if(result === DialogResult.Accepted)
         {
-            for(var i = 0; i < textOptionView.model.count; i++) {
-                if(textOptionView.model.get(i).selected)
-                {
-                    if(filter.length > 0) {
-                        filter += "|";
+            if(is_multilevel())
+            {
+                for(var i = 0; i < textOptionView.model.count; i++) {
+                    if(textOptionView.model.get(i).selected)
+                    {
+                        if(filter.length > 0) {
+                            filter += "|";
+                        }
+
+                        filter += textOptionView.model.get(i).option;
                     }
-
-                    filter += textOptionView.model.get(i).option;
                 }
-            }
 
-            console.log("Filtering '" + filterType + "': " + filter);
+                console.log("Filtering '" + filterType + "': " + filter);
+            }
+            else
+            {
+                console.log("Chose: " + filter);
+            }
         }
     }
 
@@ -91,7 +112,7 @@ Dialog {
         VerticalScrollDecorator {}
 
         ViewPlaceholder {
-            enabled: conf_sched.DEBUG && textOptionView.count === 0
+            enabled: conf_sched.DEBUG && is_multilevel() && textOptionView.count === 0
             text: "Sorry!"
             hintText: "This is a bug. :-("
         }
@@ -108,13 +129,22 @@ Dialog {
                 width: parent.width
                 label: "Filter by"
                 currentIndex: __defaultIndex
-                onCurrentIndexChanged: set_submenu_model(value);
+                onCurrentIndexChanged: {
+                    if(is_multilevel())
+                    {
+                        set_submenu_model(value);
+                    }
+                    else
+                    {
+                        filter = options[currentIndex];
+                    }
+                }
 
                 menu: ContextMenu {
                     Repeater {
                         id: mainMenuRepeater
                         //use the array of keys as main menu options
-                        model: options != null ? Object.keys(options)  : null;
+                        model: options != null ? get_main_menu_options()  : null;
                         MenuItem { text: modelData }
                     }
                 }
