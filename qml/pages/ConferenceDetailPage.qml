@@ -69,7 +69,7 @@ Page {
                             return; //we did not filter, so we do not need to enable clearing the subSelection
                         }
                         text = "Filter for: " + dialog.mainSelection;
-                        clearFilterMenu.enabled = true;
+                        clearFilterMenu.visible = true;
                     });
                 }
                 enabled: confDetailView.count > 0 && conf !== null
@@ -104,7 +104,7 @@ Page {
                 text: "Upcoming events"
                 onClicked: {
                     confDetailView.model.filter_by(ConferenceEventList.FilterCurrentTime);
-                    clearFilterMenu.enabled = true;
+                    clearFilterMenu.visible = true;
                 }
                 enabled: confDetailView.count > 0 && conf !== null
             }
@@ -112,7 +112,7 @@ Page {
                 text: "Favorites"
                 onClicked: {
                     confDetailView.model.filter_by(ConferenceEventList.FilterFavorite);
-                    clearFilterMenu.enabled = true;
+                    clearFilterMenu.visible = true;
                 }
                 enabled: confDetailView.count > 0 && conf !== null
             }
@@ -121,9 +121,9 @@ Page {
                 text: "Clear filters"
                 onClicked: {
                     confDetailView.model.filter_by(ConferenceEventList.FilterNone);
-                    enabled = false;
+                    visible = false;
                 }
-                enabled: false
+                visible: false
             }
         }
 
