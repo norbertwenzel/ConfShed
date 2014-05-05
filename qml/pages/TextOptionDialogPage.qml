@@ -8,6 +8,7 @@ Dialog {
     property var options: ({})
     property string filterType: ""
     property string filter: ""
+    property string comboText: "Filter for"
 
     property int __defaultIndex: 0
     property var __menus: ({})
@@ -127,7 +128,7 @@ Dialog {
             ComboBox {
                 id: mainMenu
                 width: parent.width
-                label: "Filter by"
+                label: comboText
                 currentIndex: __defaultIndex
                 onCurrentIndexChanged: {
                     if(is_multilevel())
