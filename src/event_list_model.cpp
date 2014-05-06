@@ -4,7 +4,12 @@
 #include <algorithm>
 #include <iterator>
 
+#include <boost/utility.hpp>
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <QDebug>
+#include <QStringList>
+#include <QMetaEnum>
 
 using cfs::event_list_model;
 
@@ -104,35 +109,66 @@ QVariant event_list_model::data(const QModelIndex &index, int role) const
 void event_list_model::sort_by(event_list_model::sort_criteria criterion,
                                Qt::SortOrder order /* = Qt::AscendingOrder */)
 {
-    qDebug();
+#ifndef NDEBUG
+    const auto &mo = event_list_model::staticMetaObject;
+    const auto &me = mo.enumerator(mo.indexOfEnumerator("sort_criteria"));
+#endif
+
+    qDebug() << "criterion =" <<
+#ifndef NDEBUG
+                me.valueToKey(criterion) <<
+#else
+                criterion <<
+#endif
+                "order =" << order;
+
+#ifndef NDEBUG
+    decltype(data_) old_items;
+    old_items.reserve(rowCount());
+    std::copy(std::begin(*this), std::end(*this), std::back_inserter(old_items));
+    assert(old_items.size() == boost::numeric_cast<decltype(old_items.size())>(rowCount()));
+#endif
 
     emit layoutAboutToBeChanged();
 
-    std::sort(std::begin(data_), std::end(data_),
+    //make sure, that all events are in order of their starttime
+    //SortDay already sorts by starttime, so no need to sort twice
+    if(criterion != SortDay)
+    {
+        std::sort(std::begin(*this), std::end(*this),
+        [](const cfs::event *e1, const cfs::event *e2)
+        {
+            return e1->starttime() < e2->starttime();
+        });
+    }
+
+    std::stable_sort(std::begin(*this), std::end(*this),
     [=](const cfs::event *e1, const cfs::event *e2) -> bool
     {
         if(criterion == SortTitle)
         {
+            const auto &result = QString::compare(e1->title(), e2->title(), Qt::CaseInsensitive);
             if(order == Qt::AscendingOrder)
             {
-                return e1->title() < e2->title();
+                return result < 0;
             }
             else
             {
                 assert(order == Qt::DescendingOrder);
-                return e1->title() > e2->title();
+                return result > 0;
             }
         }
         else if(criterion == SortTrack)
         {
+            const auto &result = QString::compare(e1->track(), e2->track(), Qt::CaseInsensitive);
             if(order == Qt::AscendingOrder)
             {
-                return e1->track() < e2->track();
+                return result < 0;
             }
             else
             {
                 assert(order == Qt::DescendingOrder);
-                return e1->track() > e2->track();
+                return result > 0;
             }
         }
         else if(criterion == SortDay)
@@ -147,15 +183,46 @@ void event_list_model::sort_by(event_list_model::sort_criteria criterion,
                 return e1->starttime() > e2->starttime();
             }
         }
+        else if(criterion == SortRoom)
+        {
+            const auto &result = QString::compare(e1->room(), e2->room(), Qt::CaseInsensitive);
+            if(order == Qt::AscendingOrder)
+            {
+                return result < 0;
+            }
+            else
+            {
+                assert(order == Qt::DescendingOrder);
+                return result > 0;
+            }
+        }
         assert(false);
         return false;
     });
 
     changePersistentIndex(createIndex(0, 0), createIndex(rowCount() - 1, 0));
+
+#ifndef NDEBUG
+    //print all the items, for easier debugging
+    for(const auto &e : *this)
+    {
+        qDebug() << e->starttime() << e->title() << e->track();
+    }
+
+    //make sure the items are all the same, but only in a possibly different order
+    assert(old_items.size() == boost::numeric_cast<decltype(old_items.size())>(rowCount()));
+    std::sort(std::begin(old_items), std::end(old_items));
+    std::for_each(std::begin(*this), std::end(*this),
+        [&](const cfs::event* ev)
+        {
+            assert(std::binary_search(std::begin(old_items), std::end(old_items), ev));
+        });
+#endif
+
     emit layoutChanged();
 }
 
-void event_list_model::filter_by(event_list_model::filter_criteria criterion, QString the_filter)
+void event_list_model::filter_by(event_list_model::filter_criteria criterion, QString the_filter /* = QString() */)
 {
     qDebug() << criterion << the_filter;
 
@@ -164,6 +231,7 @@ void event_list_model::filter_by(event_list_model::filter_criteria criterion, QS
         filter_.clear();
         beginInsertRows(QModelIndex(), rowCount(), data_.size() - rowCount());
         filtered_size_ = -1;
+        assert(rowCount() == boost::numeric_cast<decltype(rowCount())>(data_.size()));
         emit endInsertRows();
 
         return;
@@ -172,35 +240,65 @@ void event_list_model::filter_by(event_list_model::filter_criteria criterion, QS
     assert(criterion != FilterNone);
     filter_ = std::move(the_filter);
 
+    const auto filterItems = filter_.split("|");
+    const auto compare_any = [](const QStringList &list, const QString &term)
+    {
+        const auto it = std::find_if(std::begin(list), std::end(list),
+                                     [&](const QString &item)
+                                     {
+                                        return QString::compare(term, item, Qt::CaseInsensitive) == 0;
+                                     });
+        return it != std::end(list); //true if one item matches
+    };
+
     emit layoutAboutToBeChanged();
 
     int new_size = -1;
     if(criterion == FilterTrack)
     {
         const auto it = std::stable_partition(std::begin(data_), std::end(data_),
-        [&](const cfs::event *evt){ return QString::compare(evt->track(), filter_, Qt::CaseInsensitive) == 0; });
+                        [&](const cfs::event *evt){ return compare_any(filterItems, evt->track()); });
 
         new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
-        qDebug() << "Filtered" << new_size << "events for track" << filter_;
+        qDebug() << "Filtered" << new_size << "events for track(s)" << filter_;
     }
     else if(criterion == FilterDay)
     {
         const auto it = std::stable_partition(std::begin(data_), std::end(data_),
-        [&](const cfs::event *evt){ return QString::compare(get_weekday(*evt), filter_, Qt::CaseInsensitive) == 0; });
+                        [&](const cfs::event *evt){ return compare_any(filterItems, get_weekday(*evt)); });
 
         new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
-        qDebug() << "Filtered" << new_size << "events for day" << filter_;
+        qDebug() << "Filtered" << new_size << "events for day(s)" << filter_;
+    }
+    else if(criterion == FilterRoom)
+    {
+        const auto it = std::stable_partition(std::begin(data_), std::end(data_),
+                        [&](const cfs::event *evt){ return compare_any(filterItems, evt->room()); });
+
+        new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
+        qDebug() << "Filtered" << new_size << "events for room(s)" << filter_;
     }
     else if(criterion == FilterCurrentTime)
     {
+        const QDateTime FILTER_TIME = QDateTime::currentDateTime();
+                //QDateTime::fromString("2014-02-02 16:00:00", "yyyy-MM-dd HH:mm:ss");
+
         const auto it = std::stable_partition(std::begin(data_), std::end(data_),
-        [&](const cfs::event *evt){ return evt->starttime() > QDateTime::currentDateTime(); });
+        [&](const cfs::event *evt){ return evt->starttime() > FILTER_TIME; });
 
         new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
-        qDebug() << "Filtered" << new_size << "events with starttime >" << QDateTime::currentDateTime();
+        qDebug() << "Filtered" << new_size << "events with starttime >" << FILTER_TIME;
+    }
+    else if(criterion == FilterFavorite)
+    {
+        const auto it = std::stable_partition(std::begin(data_), std::end(data_),
+                        [](const cfs::event *evt) { return evt->favorite(); });
+
+        new_size = it != std::end(data_) ? std::distance(std::begin(data_), it) : -1;
+        qDebug() << "Filtered" << new_size << "favorite events";
     }
 
-    changePersistentIndex(createIndex(0, 0), createIndex(rowCount() - 1, 0));
+    changePersistentIndex(createIndex(0, 0), createIndex(std::max(rowCount() - 1, 0), 0));
     emit layoutChanged();
 
     beginRemoveRows(QModelIndex(), new_size, data_.size());
@@ -208,6 +306,20 @@ void event_list_model::filter_by(event_list_model::filter_criteria criterion, QS
     filtered_size_ = new_size;
 
     emit endRemoveRows();
+
+#ifndef NDEBUG
+    //check filtered data
+    decltype(data_) filtered_test_data;
+    filtered_test_data.reserve(rowCount());
+    std::copy(std::begin(*this), std::end(*this), std::back_inserter(filtered_test_data));
+    filtered_test_data = make_unique_set(std::move(filtered_test_data));
+    assert(filtered_test_data.size() == boost::numeric_cast<decltype(filtered_test_data.size())>(rowCount())); //no item should occur twice in our list
+
+    //check full/unfiltered data
+    decltype(data_) full_test_data(data_);
+    full_test_data = make_unique_set(std::move(full_test_data));
+    assert(full_test_data.size() == data_.size()); //no item should occur twice in our list
+#endif
 }
 
 QVariant event_list_model::headerData(int section, Qt::Orientation orientation, int role) const
@@ -225,6 +337,57 @@ QVariant event_list_model::headerData(int section, Qt::Orientation orientation, 
     {
         return QString("Row %1").arg(section);
     }
+}
+
+int event_list_model::dataCount() const
+{
+    return boost::numeric_cast<int>(data_.size());
+}
+
+QList<QString> event_list_model::getTracks() const
+{
+    //TODO: cache result instead of recomputing
+
+    QList<QString> tracks;
+    tracks.reserve(data_.size());
+    std::transform(std::begin(data_), std::end(data_), std::back_inserter(tracks),
+                   [](const cfs::event *evt){ return evt->track(); });
+    tracks = make_unique_set(std::move(tracks));
+
+    qDebug() << "Returned" << tracks.length() << "tracks.";
+
+    return tracks;
+}
+
+QList<QString> event_list_model::getRooms() const
+{
+    //TODO: cache result instead of recomputing
+
+    QList<QString> rooms;
+    rooms.reserve(data_.size());
+    std::transform(std::begin(data_), std::end(data_), std::back_inserter(rooms),
+                   [](const cfs::event *evt){ return evt->room(); });
+    rooms = make_unique_set(std::move(rooms));
+
+    qDebug() << "Returned" << rooms.length() << "rooms.";
+
+    return rooms;
+}
+
+QList<QString> event_list_model::getDays() const
+{
+    //TODO: cache result instead of recomputing
+    //BUG: atm conferences longer than one week return just 7 days
+
+    QList<QString> days;
+    days.reserve(data_.size());
+    std::transform(std::begin(data_), std::end(data_), std::back_inserter(days),
+                   [&](const cfs::event *evt){ return get_weekday(*evt); });
+    days = make_unique_set(std::move(days));
+
+    qDebug() << "Returned" << days.length() << "days.";
+
+    return days;
 }
 
 bool event_list_model::make_item_favorite(int index, bool favorite)
@@ -254,4 +417,43 @@ cfs::event* event_list_model::get(int id) const
 QString event_list_model::get_weekday(const cfs::event &evt) const
 {
     return evt.starttime().toString("dddd");
+}
+
+template<typename T>
+T event_list_model::make_unique_set(T&& data) const
+{
+    std::sort(std::begin(data), std::end(data));
+    data.erase(std::unique(std::begin(data), std::end(data)), std::end(data));
+
+    return data;
+}
+
+event_list_model::iterator event_list_model::begin()
+{
+    return std::begin(data_);
+}
+
+event_list_model::iterator event_list_model::end()
+{
+    return boost::next(std::begin(data_), rowCount());
+}
+
+event_list_model::const_iterator event_list_model::begin() const
+{
+    return cbegin();
+}
+
+event_list_model::const_iterator event_list_model::end() const
+{
+    return cend();
+}
+
+event_list_model::const_iterator event_list_model::cbegin() const
+{
+    return std::begin(data_);
+}
+
+event_list_model::const_iterator event_list_model::cend() const
+{
+    return boost::next(std::begin(data_), rowCount());
 }
