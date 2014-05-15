@@ -20,6 +20,7 @@ Page {
     }
 
     function add_debug_conferences() {
+        conf_sched.addConference("https://cfp.linuxwochen.at/de/lww14/public/schedule.xml")
         conf_sched.addConference("https://fosdem.org/2014/schedule/xml");
         conf_sched.addConference("https://cfp.linuxwochen.at/de/lww2013/public/schedule.xml");
         conf_sched.addConference("http://sigint.ccc.de/schedule/schedule.xml");
