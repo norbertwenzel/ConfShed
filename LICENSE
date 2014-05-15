@@ -1,0 +1,11 @@
+--2014-05-15 23:05:57--  http://www.gnu.org/licenses/gpl.txt
+Resolving www.gnu.org (www.gnu.org)... 2001:4830:134:3::a, 208.118.235.148
+Connecting to www.gnu.org (www.gnu.org)|2001:4830:134:3::a|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 35147 (34K) [text/plain]
+Saving to: `gpl.txt'
+
+     0K .......... .......... .......... ....                 100% 82.6K=0.4s
+
+2014-05-15 23:05:58 (82.6 KB/s) - `gpl.txt' saved [35147/35147]
+
