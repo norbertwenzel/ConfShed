@@ -45,6 +45,7 @@ void qt_downloader::start_download()
     QNetworkRequest req(source_);
     req.setHeader(QNetworkRequest::UserAgentHeader, QString("ConfSched for Sailfish"));
     req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
+    req.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
     reply_ = manager_.get(req);
 }
 
@@ -74,7 +75,9 @@ void qt_downloader::finished(QNetworkReply *data)
     if(no_error)
     {
         const auto &content_type = data->header(QNetworkRequest::ContentTypeHeader).toString();
-        qDebug() << "content_type: " << content_type;
+        const auto &redir = data->attribute(QNetworkRequest::RedirectionTargetAttribute);
+        qDebug() <<  "content_type: " << content_type << "; redirection: " << redir;
+
         const bool is_text = content_type.startsWith("text", Qt::CaseInsensitive) || content_type.contains("xml", Qt::CaseInsensitive);
         const auto idx_left = content_type.length() - content_type.lastIndexOf('=') - 1;
         const QString charset = idx_left > 0 && idx_left < content_type.length() ? content_type.rightRef(idx_left).toString() : QString("utf-8"); //assume utf8 encoding

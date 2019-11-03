@@ -48,7 +48,7 @@ std::unique_ptr<conference_data> pentabarf_parser::parse(QFile &file, conference
         }
         if(xml.hasError())
         {
-            qDebug() << "XML parsing error: " << xml.errorString();
+            qDebug() << "XML parsing error: " << xml.errorString() << " (" << xml.error() << ")";
             throw std::runtime_error("Failed to parse conference data.");
         }
 
